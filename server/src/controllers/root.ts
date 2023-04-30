@@ -1,30 +1,28 @@
 // src/controllers/root.ts
 
-export default {
-  index: _index,
-};
+import { newHeader } from "../utilities/newHeader.ts";
 
-function _index(ctx) {
-  const res = {
-    status: 200,
-    bundle: {},
-    header: {
-      id: "WHEREABOUTS Server",
-      time: Math.floor(Date.now() / 1000),
-      title: "API Version List",
-    },
-  };
+export { root };
 
-  res.bundle = {
-    versions: [
-      {
-        href: "/v1/",
-        name: "Version 1 - API Capabilities",
-        desc: "",
-      },
-    ],
-  };
+// deno-lint-ignore no-explicit-any
+function root(ctx: any) {
+	const res = newHeader("Service Capabilities / Endpoints");
 
-  ctx.response.status = res.status;
-  ctx.response.body = { ...res.header, ...res.bundle };
+	ctx.response.body = {
+		...res,
+		capabilities: [
+			{
+				href: "/stats",
+				methods: ["GET"],
+				description:
+					"Returns statistics related to service and dataset health.",
+			},
+			{
+				href: "/features",
+				methods: ["GET"],
+				description:
+					"Returns dataset features as determined by client search parameters.",
+			},
+		],
+	};
 }

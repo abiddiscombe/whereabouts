@@ -1,12 +1,34 @@
-# whereabouts
-A GeoJSON Point Feature API, built on Deno and with MongoDB.
+# 📌 whereabouts
+A GeoJSON Point Feature API. **This project is under development!**
 
-I'm currently building whereabouts from scratch, but I'm making the repository public to share the development journey. I plan to build whereabouts with Deno, the Oak framework, and using MongoDB to store GeoJSON data. As a minimum, whereabouts will have the following capabilities:
+## Endpoints
+Endpoints with a padlock (🔒) require a `key` query parameter to access content. If you're interested in having access, reach out!
 
-- A **Geospatial Search Endpoint** supporting queries based on radius and bounding boxes.
-- A **Textual Search Endpoint** supporting queries based on the attribution stored within the GeoJSON.
-- Some form of **paging** where more features exist than it is possible to return in a single query.
-- **Key-Based Authentication** around endpoints which return data.
-- Custom **CORS** configuration options to lock-down use of the API to specific sites or web applications.
+`/`  
+Lists API server capabilities.
 
-It's likely the scope of whereabouts will change as I build it in my spare time outside of work. I'd be interested to hear any suggestions you have for the project! Cheers, Archie.
+`/stats` (🔒)  
+Returns statistics about the API server and database.
+
+`/features` (🔒)  
+Returns GeoJSON features based on one of the following search methods:
+- Radius Search = `?radius=lng,lat,distance`
+- Bounding Box Search = `?bounds=1,2,3,4`
+
+## Development To-Dos
+This repo will eventually consist of an API server and a frontend UI. Most development effort is placed on the former.  I'm making the repository public to share my development journey.
+
+### API Server
+- [x] Initital Project Setup
+- [x] Endpoint - Root
+- [x] Endpoint - Features (bbox, radius)
+- [x] Endpoint - Statistics
+- [x] Key-Based Auth - Endpoint Protection
+- [ ] Key-Based Auth - Key Management
+- [ ] Feature Paging
+
+### Frontend UI (Demo)
+- [ ] Initital Project Setup
+- [ ] API Statistics
+- [ ] Feature Search - Radius
+- [ ] Feature Search - Bounding Box
