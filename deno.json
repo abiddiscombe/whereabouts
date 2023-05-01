@@ -10,7 +10,8 @@
     }
   },
   "tasks": {
-    "dev": "deno run --allow-net --allow-env --watch src/main.ts"
+    "dev": "deno run --allow-net --allow-env --watch src/main.ts",
+    "startProd": "deno run --allow-net --allow-env --watch src/main.ts"
   },
   "imports": {
     "oak": "https://deno.land/x/oak/mod.ts",
