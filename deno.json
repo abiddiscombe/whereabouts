@@ -12,5 +12,11 @@
   "tasks": {
     "dev": "deno run --allow-net --allow-env --watch src/main.ts"
   },
-  "importMap": "./import_map.json"
+  "imports": {
+    "oak": "https://deno.land/x/oak/mod.ts",
+    "cors": "https://deno.land/x/cors/mod.ts",
+    "mongo": "https://deno.land/x/mongo/mod.ts",
+    "turf-area": "npm:@turf/area",
+    "turf-bboxPolygon": "npm:@turf/bbox-polygon"
+  }
 }
