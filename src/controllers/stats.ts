@@ -9,31 +9,30 @@ export { stats };
 
 // deno-lint-ignore no-explicit-any
 async function stats(ctx: any) {
-	const res = newHeader("API Service Statistics");
+  const res = newHeader("API Service Statistics");
 
-	const userKey = ctx.request.url.searchParams.get("key") || "";
+  const userKey = ctx.request.url.searchParams.get("key") || "";
 
-	if (!userKey /* allows fast-fail */ || !await verifyKey(userKey)) {
-		ctx.response.status = 401;
-		ctx.response.body = {
-			...res,
-			error:
-				"Unauthorised. A valid API key is required.",
-		};
-		return;
-	}
+  if (!userKey /* allows fast-fail */ || !await verifyKey(userKey)) {
+    ctx.response.status = 401;
+    ctx.response.body = {
+      ...res,
+      error: "Unauthorised. A valid API key is required.",
+    };
+    return;
+  }
 
-	try {
-		ctx.response.body = {
-			...res,
-			totalKeys: await getAuthTokenCount(),
-			totalFeatures: await getFeatureCount()
-		};
-	} catch {
-		ctx.response.status = 500;
-		ctx.response.body = {
-			...res,
-			error: "Failed to fetch statistics. Please try again later.",
-		};
-	}
+  try {
+    ctx.response.body = {
+      ...res,
+      totalKeys: await getAuthTokenCount(),
+      totalFeatures: await getFeatureCount(),
+    };
+  } catch {
+    ctx.response.status = 500;
+    ctx.response.body = {
+      ...res,
+      error: "Failed to fetch statistics. Please try again later.",
+    };
+  }
 }

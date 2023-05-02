@@ -9,7 +9,7 @@ export { bboxAreaCheck };
 const MAX_BBOX_SIZE = 1000000;
 
 function bboxAreaCheck(bbox: number[]) {
-	const featurePolygon = bboxPolygon(bbox);
-	const featurePolygonArea = area(featurePolygon);
-	return (featurePolygonArea >= MAX_BBOX_SIZE) ? true : false;
+  const featurePolygon = bboxPolygon(bbox);
+  const featurePolygonArea = area(featurePolygon);
+  return (featurePolygonArea >= MAX_BBOX_SIZE) ? true : false;
 }

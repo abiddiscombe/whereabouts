@@ -29,5 +29,5 @@ console.info("WHEREABOUTS API Server Started.");
 console.info("Listening on http://127.0.0.1:8080.");
 
 await server.listen({
-	port: 8080,
+  port: 8080,
 });
