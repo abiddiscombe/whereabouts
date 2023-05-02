@@ -1,5 +1,5 @@
 # Dockerfile for WHEREABOUTS API Server
-# Build: docker build . -t registry.digitalocean.com/abws/whereabouts:latest
+# Build: docker build . -t registry.digitalocean.com/abws/whereabouts:semver
 
 # For ARM64 (Apple M1, Raspberry Pi) builds
 FROM lukechannings/deno:latest
