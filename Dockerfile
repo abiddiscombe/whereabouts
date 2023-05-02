@@ -1,7 +1,7 @@
 # Dockerfile for WHEREABOUTS API Server
-# Build: docker build . -t whereabouts
+# Build: docker build . -t registry.digitalocean.com/abws/whereabouts:latest
 
-# (note) for Apple M1 / Raspberry Pi builds, use lukechannings/deno:latest
+# For ARM64 (Apple M1, Raspberry Pi) builds, use lukechannings/deno:latest
 FROM denoland/deno:latest
 
 EXPOSE 8080
