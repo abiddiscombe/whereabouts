@@ -1,8 +1,6 @@
 {
   "fmt": {
-    "files": {
-      "include": ["src/"]
-    }
+    "include": ["src/"]
   },
   "tasks": {
     "dev": "deno run --allow-net --allow-env --watch src/main.ts",

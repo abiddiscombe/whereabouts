@@ -1,11 +1,13 @@
 // src/controllers/root.ts
 
-import { newHeader } from "../utilities/newHeader.ts";
+import { newHeader } from "../utilities/header.ts";
+import { sessionCache } from "../utilities/session.ts";
 
 export { root };
 
 // deno-lint-ignore no-explicit-any
 function root(ctx: any) {
+  sessionCache.totalLifetimeRequests.root += 1;
   const res = newHeader("Service Capabilities / Endpoints");
 
   ctx.response.body = {

@@ -1,7 +1,7 @@
-// src/services/getAuthTokenCount.ts
+// src/services/getKeyCount.ts
 
 import { clientAuthentication } from "../utilities/database.ts";
 
-export async function getAuthTokenCount() {
+export async function getKeyCount() {
   return await clientAuthentication.count();
 }

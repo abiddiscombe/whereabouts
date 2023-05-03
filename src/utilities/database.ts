@@ -26,7 +26,7 @@ async function initDatabaseClients() {
   try {
     const mongoFeatures = new MongoClient();
     await mongoFeatures.connect(uri);
-    clientFeatures = await mongoFeatures.database().collection("main");
+    clientFeatures = await mongoFeatures.database().collection("features");
 
     const mongoAuthentication = new MongoClient();
     await mongoAuthentication.connect(uri);

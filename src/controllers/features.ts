@@ -1,20 +1,31 @@
 // controllers/features.ts
 
 import { verifyKey } from "../services/verifyKey.ts";
-import { newHeader } from "../utilities/newHeader.ts";
-import { bboxAreaCheck } from "../utilities/bboxAreaCheck.ts";
+import { newHeader } from "../utilities/header.ts";
+import { bboxTooLarge } from "../utilities/bbox.ts";
+import { sessionCache } from "../utilities/session.ts";
 import { searchByRadius } from "../services/searchByRadius.ts";
 import { searchByBounds } from "../services/searchByBounds.ts";
+import { stringToFloatArray } from "../utilities/conversion.ts";
 
 export { features };
 
 // deno-lint-ignore no-explicit-any
 async function features(ctx: any) {
+  sessionCache.totalLifetimeRequests.features += 1;
   const res = newHeader("Geospatial Feature Search");
 
-  const userKey = ctx.request.url.searchParams.get("key") || "";
+  const params = {
+    key: ctx.request.url.searchParams.get("key"),
+    bbox: ctx.request.url.searchParams.get("bbox"),
+    radius: ctx.request.url.searchParams.get("radius"),
+    filter: ctx.request.url.searchParams.get("filter") || "",
+  };
 
-  if (!userKey /* allows fast-fail */ || !await verifyKey(userKey)) {
+  params.filter = params.filter.toLowerCase();
+
+  if (!params.key || !await verifyKey(params.key)) {
+    sessionCache.totalLifetimeFailedAuthenticationEvents += 1;
     ctx.response.status = 401;
     ctx.response.body = {
       ...res,
@@ -23,73 +34,55 @@ async function features(ctx: any) {
     return;
   }
 
-  const userParams = {
-    bbox: ctx.request.url.searchParams.get("bbox") || undefined,
-    radius: ctx.request.url.searchParams.get("radius") || undefined,
-  };
-
-  if (userParams.bbox && userParams.radius) {
+  if (params.bbox && params.radius) {
     ctx.response.status = 406;
     ctx.response.body = {
       ...res,
-      error: "Please provide a single method (bbox, radius) to search by.",
+      error: "Please provide only a single method (bbox, radius) to search by.",
     };
-  } else if (userParams.bbox) {
-    res.name += " (Bounding Box)";
-    const resPayload = await _handleBoundsQuery(userParams.bbox);
-    ctx.response.status = resPayload.status;
-    ctx.response.body = {
-      ...res,
-      ...resPayload.body,
-    };
-  } else if (userParams.radius) {
-    res.name += " (Radius)";
-    const resPayload = await _handleRadiusQuery(userParams.radius);
-    ctx.response.status = resPayload.status;
-    ctx.response.body = {
-      ...res,
-      ...resPayload.body,
-    };
-  } else {
-    ctx.response.status = 406;
-    ctx.response.body = {
-      ...res,
-      error:
-        "Please provide a method via query param (bbox, radius) to search by.",
-    };
+    return;
   }
+
+  if (params.bbox) {
+    res.name += " (Bounding Box)";
+    const handlerResponse = await _handleBBox(params.bbox, params.filter);
+    ctx.response.status = handlerResponse.status;
+    ctx.response.body = { ...res, ...handlerResponse.body };
+    return;
+  }
+
+  if (params.radius) {
+    res.name += " (Radius)";
+    const handlerResponse = await _handleRadius(params.radius, params.filter);
+    ctx.response.status = handlerResponse.status;
+    ctx.response.body = { ...res, ...handlerResponse.body };
+    return;
+  }
+
+  ctx.response.status = 406;
+  ctx.response.body = {
+    ...res,
+    error: "Please provide one search method (bbox or radius).",
+  };
 }
 
-async function _handleBoundsQuery(bbox: string) {
-  const elements: number[] = [];
+async function _handleBBox(bbox: string, filter: string) {
+  const bboxFiltered = stringToFloatArray(bbox);
 
-  bbox.split(",").forEach((element) => {
-    try {
-      elements.push(parseFloat(element));
-    } catch {
-      return {
-        status: 401,
-        body: {
-          error: "The Bounding Box must contain only decimals.",
-        },
-      };
-    }
-  });
-
-  if (elements.length != 4) {
+  if (bboxFiltered.length !== 4) {
     return {
       status: 401,
       body: {
-        error: "The Bounding Box must contain four elements.",
+        error: "Bounding Box (bbox) invalid.",
       },
     };
   }
 
-  if (bboxAreaCheck(elements)) {
+  if (bboxTooLarge(bboxFiltered)) {
     return {
       status: 401,
       body: {
-        error: "The Bounding Box is too large. Maximum size is 500 m2",
+        error: "Bounding Box too large. Maximum size is 1 km2",
       },
     };
   }
@@ -97,66 +90,50 @@ async function _handleBoundsQuery(bbox: string) {
   return {
     status: 200,
     body: {
-      type: "FeatureCollection",
       search: {
-        bbox: elements,
+        ...(filter) ? { filter: filter } : {},
+        bbox: bbox,
       },
-      features: await searchByBounds(elements),
+      type: "FeatureCollection",
+      features: await searchByBounds(bboxFiltered, filter),
     },
   };
 }
 
-async function _handleRadiusQuery(radius: string) {
-  const elements: number[] = [];
+async function _handleRadius(radius: string, filter: string) {
+  const center = stringToFloatArray(radius);
+  const distance = (center.length === 3) ? center.pop() : 1000;
 
-  radius.split(",").forEach((element) => {
-    try {
-      elements.push(parseFloat(element));
-    } catch {
-      return {
-        status: 401,
-        body: {
-          error: "The Radius must contain only decimals.",
-        },
-      };
-    }
-  });
-
-  if (elements.length === 2) elements.push(1000);
-
-  if (elements.length != 3) {
+  if (center.length !== 2) {
     return {
       status: 401,
       body: {
-        error: "A Radius must contain two or three elements.",
+        error: "Radius (radius) invalid.",
       },
     };
   }
 
-  if (elements[2] < 1 || elements[2] > 1000) {
+  if (distance < 1 || distance > 1000) {
     return {
       status: 401,
       body: {
-        error:
-          "Distance (dist) out of range. Please specify a search distance between 1 and 1000 meters.",
+        error: "Distance outside of acceptable range (1 to 1000 meters).",
       },
     };
   }
-
-  const features = await searchByRadius([
-    elements[0],
-    elements[1],
-  ], elements[2]);
 
   return {
     status: 200,
     body: {
-      type: "FeatureCollection",
       search: {
-        center: [elements[0], elements[1]],
-        distance: elements[2],
+        ...(filter) ? { filter: filter } : {},
+        radius: {
+          center: center,
+          distance: distance,
+        },
       },
-      features: features,
+      type: "FeatureCollection",
+      features: await searchByRadius(center, distance, filter),
     },
   };
 }
