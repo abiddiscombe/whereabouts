@@ -62,7 +62,7 @@ The `authentication` collection holds API keys and whether they should be accept
 ```
 
 ### Deployment
-The server image is [published to Docker Hub](https://hub.docker.com/u/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`.
+The server image is [published to Docker Hub](https://hub.docker.com/r/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`.
 
 > The image is currently limited to `arm64` architectures (suitable for Apple M1/M2 or Raspberry Pi 4).
 > If there is demand for an `amd64` build, this can be investigated in the future.
