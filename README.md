@@ -3,7 +3,7 @@ A Geospatial (GeoJSON) Point Feature API.
 Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com).
 
 ## Demo
-You can try Whereabouts using [this demo](https://whereabouts.labs.archiebiddiscombe.net), which is loaded with the [Ordnance Survey OpenNames](https://osdatahub.os.uk/docs/names/overview) dataset.  
+You can try Whereabouts using [this demo](https://whereabouts.labs.archiebiddiscombe.net) which is loaded with the [Ordnance Survey OpenNames](https://osdatahub.os.uk/docs/names/overview) dataset.  
 Use the API key `demo-testing` where needed. Please play fair, this demo is for experimental use only.
 
 ## API Endpoints
@@ -62,13 +62,13 @@ The `authentication` collection holds API keys and whether they should be accept
 ```
 
 ### Deployment
-The server image is published to Docker Hub as `abiddiscombe/whereabouts`.
+The server image is [published to Docker Hub](https://hub.docker.com/u/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`.
 
 > The image is currently limited to `arm64` architectures (suitable for Apple M1/M2 or Raspberry Pi 4).
 > If there is demand for an `amd64` build, this can be investigated in the future.
 
 The server requires the following environment variables:
 
-`MONGO_URI`  
-A valid connection string to your MongoDB database, this may need to include authentication and TLS security parameters.
-It will look something like `mongodb+srv://username:password@mongodb.example.com/databaseName?replicaSet=serverName&tls=true&authMechanism=SCRAM-SHA-1&authSource=admin` but the exact configuration will depend on your infrastructure.
+- `MONGO_URI`  
+A valid connection string to your MongoDB database.  
+It will look something like: `mongodb+srv://username:password@mongodb.example.com/databaseName?replicaSet=serverName&tls=true&authMechanism=SCRAM-SHA-1&authSource=admin`.
