@@ -1,2 +1,5 @@
 # Visual Studio Code
 .vscode
+
+# Deno
+deno.lock
