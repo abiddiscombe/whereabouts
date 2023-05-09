@@ -3,7 +3,7 @@ A Geospatial (GeoJSON) Point Feature API.
 Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com).
 
 ## Demo
-You can try Whereabouts using [this demo](https://whereabouts.labs.archiebiddiscombe.net) which is loaded with the [Ordnance Survey OpenNames](https://osdatahub.os.uk/docs/names/overview) dataset.  
+You can try Whereabouts using [this demo](https://whereabouts-demo.archiebiddiscombe.net) which is loaded with the [Ordnance Survey OpenNames](https://osdatahub.os.uk/docs/names/overview) dataset.  
 Use the API key `demo-testing` where needed. Please play fair, this demo is for experimental use only.
 
 ## API Endpoints
