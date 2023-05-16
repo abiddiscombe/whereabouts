@@ -2,7 +2,7 @@
 # Build: docker build . -t abiddiscombe/whereabouts:semver
 
 # For ARM64 (Apple M1, Raspberry Pi) builds
-FROM lukechannings/deno:latest
+FROM denoland/deno:latest
 
 EXPOSE 8080
 
