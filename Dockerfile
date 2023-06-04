@@ -1,7 +1,6 @@
-# Dockerfile for WHEREABOUTS API Server
+# Dockerfile for the WHEREABOUTS API Server
 # Build: docker build . -t abiddiscombe/whereabouts:semver
 
-# For ARM64 (Apple M1, Raspberry Pi) builds
 FROM denoland/deno:latest
 
 EXPOSE 8080
