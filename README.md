@@ -1,4 +1,4 @@
-# 📌 whereabouts
+# Whereabouts API Server
 A Geospatial (GeoJSON) Point Feature API.  
 Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com).
 
