@@ -3,7 +3,6 @@
 import { verifyKey } from "../services/verifyKey.ts";
 import { newHeader } from "../utilities/header.ts";
 import { bboxTooLarge } from "../utilities/bbox.ts";
-import { sessionCache } from "../utilities/session.ts";
 import { searchByRadius } from "../services/searchByRadius.ts";
 import { searchByBounds } from "../services/searchByBounds.ts";
 import { stringToFloatArray } from "../utilities/conversion.ts";
@@ -12,7 +11,6 @@ export { features };
 
 // deno-lint-ignore no-explicit-any
 async function features(ctx: any) {
-  sessionCache.totalLifetimeRequests.features += 1;
   const res = newHeader("Geospatial Feature Search");
 
   const params = {
@@ -25,7 +23,6 @@ async function features(ctx: any) {
   params.filter = params.filter.toLowerCase();
 
   if (!params.key || !await verifyKey(params.key)) {
-    sessionCache.totalLifetimeFailedAuthenticationEvents += 1;
     ctx.response.status = 401;
     ctx.response.body = {
       ...res,
