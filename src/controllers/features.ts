@@ -1,7 +1,6 @@
 // controllers/features.ts
 
 import { verifyKey } from "../services/verifyKey.ts";
-import { newHeader } from "../utilities/header.ts";
 import { bboxTooLarge } from "../utilities/bbox.ts";
 import { searchByRadius } from "../services/searchByRadius.ts";
 import { searchByBounds } from "../services/searchByBounds.ts";
@@ -11,7 +10,7 @@ export { features };
 
 // deno-lint-ignore no-explicit-any
 async function features(ctx: any) {
-  const res = newHeader("Geospatial Feature Search");
+  ctx.state.metadata.title += ' > Features';
 
   const params = {
     key: ctx.request.url.searchParams.get("key"),
@@ -25,7 +24,7 @@ async function features(ctx: any) {
   if (!params.key || !await verifyKey(params.key)) {
     ctx.response.status = 401;
     ctx.response.body = {
-      ...res,
+      ...ctx.state.metadata,
       error: "Unauthorised. A valid API key is required.",
     };
     return;
@@ -34,31 +33,35 @@ async function features(ctx: any) {
   if (params.bbox && params.radius) {
     ctx.response.status = 406;
     ctx.response.body = {
-      ...res,
+      ...ctx.state.metadata,
       error: "Please provide only a single method (bbox, radius) to search by.",
     };
     return;
   }
 
   if (params.bbox) {
-    res.name += " (Bounding Box)";
     const handlerResponse = await _handleBBox(params.bbox, params.filter);
     ctx.response.status = handlerResponse.status;
-    ctx.response.body = { ...res, ...handlerResponse.body };
+    ctx.response.body = {
+      ...ctx.state.metadata,
+      ...handlerResponse.body
+    };
     return;
   }
 
   if (params.radius) {
-    res.name += " (Radius)";
     const handlerResponse = await _handleRadius(params.radius, params.filter);
     ctx.response.status = handlerResponse.status;
-    ctx.response.body = { ...res, ...handlerResponse.body };
+    ctx.response.body = {
+      ...ctx.state.metadata,
+      ...handlerResponse.body
+    };
     return;
   }
 
   ctx.response.status = 406;
   ctx.response.body = {
-    ...res,
+    ...ctx.state.metadata,
     error: "Please provide one search method (bbox or radius).",
   };
 }

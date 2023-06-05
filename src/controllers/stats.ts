@@ -1,6 +1,5 @@
 // src/controllers/stats.ts
 
-import { newHeader } from "../utilities/header.ts";
 import { getKeyCount } from "../services/getKeyCount.ts";
 import { getFeatureCount } from "../services/getFeatureCount.ts";
 
@@ -8,11 +7,10 @@ export { stats };
 
 // deno-lint-ignore no-explicit-any
 async function stats(ctx: any) {
-  const res = newHeader("API Service Statistics");
-
+  ctx.state.metadata.title += ' > Statistics';
   try {
     ctx.response.body = {
-      ...res,
+      ...ctx.state.metadata,
       features: {
         totalFeatures: await getFeatureCount(),
       },
@@ -23,7 +21,7 @@ async function stats(ctx: any) {
   } catch {
     ctx.response.status = 500;
     ctx.response.body = {
-      ...res,
+      ...ctx.state.metadata,
       error: "Failed to fetch statistics. Please try again later.",
     };
   }

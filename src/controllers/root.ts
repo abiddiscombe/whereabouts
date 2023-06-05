@@ -1,15 +1,11 @@
 // src/controllers/root.ts
 
-import { newHeader } from "../utilities/header.ts";
-
 export { root };
 
 // deno-lint-ignore no-explicit-any
 function root(ctx: any) {
-  const res = newHeader("Service Capabilities / Endpoints");
-
   ctx.response.body = {
-    ...res,
+    ...ctx.state.metadata,
     capabilities: [
       {
         href: "/stats",

@@ -5,6 +5,7 @@
 
 import { Application, Router } from "oak";
 
+import { metadata } from "./middlewares/metadata.ts";
 import { cors, initializeCors } from "./middlewares/cors.ts";
 
 import { root } from "./controllers/root.ts";
@@ -23,6 +24,7 @@ router.get("/stats", stats);
 router.get("/features", features);
 
 server.use(cors);
+server.use(metadata);
 server.use(router.routes());
 server.use(router.allowedMethods());
 
