@@ -1,6 +1,6 @@
 // services/searchByRadius
 
-import { clientFeatures } from "../utilities/database.ts";
+import { dbClient } from "../utilities/database.ts";
 
 export { searchByRadius };
 
@@ -9,7 +9,7 @@ async function searchByRadius(
   distance: number,
   classFilter: string,
 ) {
-  return await clientFeatures.find({
+  return await dbClient.find({
     ...(classFilter) ? { "properties.class": classFilter } : {},
     "geometry.coordinates": {
       $near: {

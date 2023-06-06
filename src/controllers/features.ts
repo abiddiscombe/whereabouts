@@ -1,6 +1,5 @@
 // controllers/features.ts
 
-import { verifyKey } from "../services/verifyKey.ts";
 import { bboxTooLarge } from "../utilities/bbox.ts";
 import { searchByRadius } from "../services/searchByRadius.ts";
 import { searchByBounds } from "../services/searchByBounds.ts";
@@ -13,22 +12,12 @@ async function features(ctx: any) {
   ctx.state.metadata.title += ' > Features';
 
   const params = {
-    key: ctx.request.url.searchParams.get("key"),
     bbox: ctx.request.url.searchParams.get("bbox"),
     radius: ctx.request.url.searchParams.get("radius"),
     filter: ctx.request.url.searchParams.get("filter") || "",
   };
 
   params.filter = params.filter.toLowerCase();
-
-  if (!params.key || !await verifyKey(params.key)) {
-    ctx.response.status = 401;
-    ctx.response.body = {
-      ...ctx.state.metadata,
-      error: "Unauthorised. A valid API key is required.",
-    };
-    return;
-  }
 
   if (params.bbox && params.radius) {
     ctx.response.status = 406;

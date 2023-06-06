@@ -4,17 +4,19 @@
 // https://github.com/abiddiscombe/whereabouts
 
 import { Application, Router } from "oak";
+import { initializeDbClient } from "./utilities/database.ts";
 
 import { metadata } from "./middlewares/metadata.ts";
+import { auth, initializeAuth } from "./middlewares/auth.ts";
 import { cors, initializeCors } from "./middlewares/cors.ts";
 
 import { root } from "./controllers/root.ts";
 import { stats } from "./controllers/stats.ts";
 import { features } from "./controllers/features.ts";
 
-import { initDatabaseClients } from "./utilities/database.ts";
-
+initializeAuth();
 initializeCors();
+await initializeDbClient();
 
 const server = new Application();
 const router = new Router();
@@ -24,11 +26,10 @@ router.get("/stats", stats);
 router.get("/features", features);
 
 server.use(cors);
+server.use(auth);
 server.use(metadata);
 server.use(router.routes());
 server.use(router.allowedMethods());
-
-await initDatabaseClients();
 
 console.info("WHEREABOUTS API Server Started.");
 console.info("Listening on http://127.0.0.1:8080.");

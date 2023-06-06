@@ -1,6 +1,5 @@
 // src/controllers/stats.ts
 
-import { getKeyCount } from "../services/getKeyCount.ts";
 import { getFeatureCount } from "../services/getFeatureCount.ts";
 
 export { stats };
@@ -13,9 +12,6 @@ async function stats(ctx: any) {
       ...ctx.state.metadata,
       features: {
         totalFeatures: await getFeatureCount(),
-      },
-      authentication: {
-        totalKeys: await getKeyCount(),
       }
     };
   } catch {

@@ -1,11 +1,11 @@
 // services/searchByBounds
 
-import { clientFeatures } from "../utilities/database.ts";
+import { dbClient } from "../utilities/database.ts";
 
 export { searchByBounds };
 
 async function searchByBounds(bbox: number[], classFilter: string) {
-  return await clientFeatures.find({
+  return await dbClient.find({
     ...(classFilter) ? { "properties.class": classFilter } : {},
     "geometry.coordinates": {
       $geoWithin: {
