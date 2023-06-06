@@ -33,6 +33,9 @@ async function features(ctx: any) {
     ctx.response.status = handlerResponse.status;
     ctx.response.body = {
       ...ctx.state.metadata,
+      ...(handlerResponse.body.features.length === 1000)
+        ? { warning: "1000 features have been returned. The hard-limit has been reached." }
+        : {},
       ...handlerResponse.body
     };
     return;
@@ -43,6 +46,9 @@ async function features(ctx: any) {
     ctx.response.status = handlerResponse.status;
     ctx.response.body = {
       ...ctx.state.metadata,
+      ...(handlerResponse.body.features.length === 1000)
+      ? { warning: "1000 features have been returned. The hard-limit has been reached." }
+      : {},
       ...handlerResponse.body
     };
     return;

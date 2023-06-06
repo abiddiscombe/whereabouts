@@ -16,5 +16,5 @@ async function searchByRadius(geom: number[], distance: number, filter: string) 
         $maxDistance: distance,
       },
     },
-  }).toArray();
+  }).limit(1000).toArray();
 }

@@ -15,5 +15,5 @@ async function searchByBounds(bbox: number[], classFilter: string) {
         ],
       },
     },
-  }).toArray();
+  }).limit(1000).toArray();
 }
