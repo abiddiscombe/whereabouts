@@ -1,7 +1,5 @@
 // src/middlewares/metadata.ts
 
-import { cloneState } from 'https://deno.land/x/oak@v11.1.0/structured_clone.ts';
-
 // deno-lint-ignore no-explicit-any
 export async function metadata(ctx: any, next: any) {
   ctx.state.metadata = {

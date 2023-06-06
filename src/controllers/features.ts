@@ -31,7 +31,7 @@ export async function features(ctx: any) {
     ctx.response.status = handlerResponse.status;
     ctx.response.body = {
       ...ctx.state.metadata,
-      ...(handlerResponse.body.features.length === 1000)
+      ...(handlerResponse.body.features?.length === 1000)
         ? { warning: 'The hard-limit (1,000 features) has been reached.' }
         : {},
       ...handlerResponse.body,
