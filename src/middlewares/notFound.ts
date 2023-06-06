@@ -7,7 +7,7 @@ export function notFound(ctx: any) {
     ...ctx.state.metadata,
     error: {
       code: 404,
-      desc: "Resource not found. Please check your URL.",
+      desc: 'Resource not found. Please check your URL.',
     },
   };
 }

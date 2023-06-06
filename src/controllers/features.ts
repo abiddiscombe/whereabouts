@@ -1,20 +1,18 @@
 // controllers/features.ts
 
-import { bboxTooLarge } from "../utilities/bbox.ts";
-import { searchByRadius } from "../services/searchByRadius.ts";
-import { searchByBounds } from "../services/searchByBounds.ts";
-import { stringToFloatArray } from "../utilities/conversion.ts";
-
-export { features };
+import { bboxTooLarge } from '../utilities/bbox.ts';
+import { searchByRadius } from '../services/searchByRadius.ts';
+import { searchByBounds } from '../services/searchByBounds.ts';
+import { stringToFloatArray } from '../utilities/conversion.ts';
 
 // deno-lint-ignore no-explicit-any
-async function features(ctx: any) {
+export async function features(ctx: any) {
   ctx.state.metadata.title += ' > Features';
 
   const params = {
-    bbox: ctx.request.url.searchParams.get("bbox"),
-    radius: ctx.request.url.searchParams.get("radius"),
-    filter: ctx.request.url.searchParams.get("filter") || "",
+    bbox: ctx.request.url.searchParams.get('bbox'),
+    radius: ctx.request.url.searchParams.get('radius'),
+    filter: ctx.request.url.searchParams.get('filter') || '',
   };
 
   params.filter = params.filter.toLowerCase();
@@ -23,7 +21,7 @@ async function features(ctx: any) {
     ctx.response.status = 406;
     ctx.response.body = {
       ...ctx.state.metadata,
-      error: "Please provide only a single method (bbox, radius) to search by.",
+      error: 'Please provide only a single method (bbox, radius) to search by.',
     };
     return;
   }
@@ -34,9 +32,9 @@ async function features(ctx: any) {
     ctx.response.body = {
       ...ctx.state.metadata,
       ...(handlerResponse.body.features.length === 1000)
-        ? { warning: "1000 features have been returned. The hard-limit has been reached." }
+        ? { warning: 'The hard-limit (1,000 features) has been reached.' }
         : {},
-      ...handlerResponse.body
+      ...handlerResponse.body,
     };
     return;
   }
@@ -47,9 +45,9 @@ async function features(ctx: any) {
     ctx.response.body = {
       ...ctx.state.metadata,
       ...(handlerResponse.body.features.length === 1000)
-      ? { warning: "1000 features have been returned. The hard-limit has been reached." }
-      : {},
-      ...handlerResponse.body
+        ? { warning: 'The hard-limit (1,000 features) has been reached.' }
+        : {},
+      ...handlerResponse.body,
     };
     return;
   }
@@ -57,7 +55,7 @@ async function features(ctx: any) {
   ctx.response.status = 406;
   ctx.response.body = {
     ...ctx.state.metadata,
-    error: "Please provide one search method (bbox or radius).",
+    error: 'Please provide one search method (bbox or radius).',
   };
 }
 
@@ -68,7 +66,7 @@ async function _handleBBox(bbox: string, filter: string) {
     return {
       status: 401,
       body: {
-        error: "Bounding Box (bbox) invalid.",
+        error: 'Bounding Box (bbox) invalid.',
       },
     };
   }
@@ -77,7 +75,7 @@ async function _handleBBox(bbox: string, filter: string) {
     return {
       status: 401,
       body: {
-        error: "Bounding Box too large. Maximum size is 1 km2",
+        error: 'Bounding Box too large. Maximum size is 1 km2',
       },
     };
   }
@@ -89,7 +87,7 @@ async function _handleBBox(bbox: string, filter: string) {
         ...(filter) ? { filter: filter } : {},
         bbox: bbox,
       },
-      type: "FeatureCollection",
+      type: 'FeatureCollection',
       features: await searchByBounds(bboxFiltered, filter),
     },
   };
@@ -103,7 +101,7 @@ async function _handleRadius(radius: string, filter: string) {
     return {
       status: 401,
       body: {
-        error: "Radius (radius) invalid.",
+        error: 'Radius (radius) invalid.',
       },
     };
   }
@@ -112,7 +110,7 @@ async function _handleRadius(radius: string, filter: string) {
     return {
       status: 401,
       body: {
-        error: "Distance outside of acceptable range (1 to 1000 meters).",
+        error: 'Distance outside of acceptable range (1 to 1000 meters).',
       },
     };
   }
@@ -127,7 +125,7 @@ async function _handleRadius(radius: string, filter: string) {
           distance: distance,
         },
       },
-      type: "FeatureCollection",
+      type: 'FeatureCollection',
       features: await searchByRadius(center, distance, filter),
     },
   };

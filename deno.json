@@ -1,6 +1,7 @@
 {
   "fmt": {
-    "include": ["src/"]
+    "include": ["src/"],
+    "singleQuote": true
   },
   "tasks": {
     "dev": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease --watch src/main.ts",
