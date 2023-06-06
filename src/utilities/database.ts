@@ -1,31 +1,28 @@
 // utilities/database.ts
 
-import { MongoClient } from "mongo";
+import { MongoClient } from "mongodb";
 
-export { dbClient, initializeDbClient };
+export { mongoConnector, initializeMongoConnector };
 
 // deno-lint-ignore no-explicit-any
-let dbClient: any;
+let mongoConnector: any;
 
-async function initializeDbClient() {
-  if (dbClient) {
-    console.warn("The client is already initialised.");
-    return;
-  }
+async function initializeMongoConnector() {
+  if (mongoConnector) return;
+  const mongoConnString = Deno.env.get("MONGO_URL") || '';
+  const mongoDatabaseName = Deno.env.get("MONGO_DATABASE") || '';
 
-  const uri = Deno.env.get("MONGO_URI") || undefined;
-
-  if (!uri) {
-    throw new Error(
-      "The environment variable 'MONGO_URI' was not found. Aborting.",
-    );
+  if (!mongoConnString) {
+    throw new Error("Environment Variable 'MONGO_URL' is missing.");
+  } else if (!mongoDatabaseName) {
+    throw new Error("Environment Variable 'MONGO_DATABASE' is missing.");
   }
 
   try {
-    const mongoClient = new MongoClient();
-    await mongoClient.connect(uri);
-    dbClient = await mongoClient.database().collection("features");
+    const client = new MongoClient(mongoConnString);
+    await client.connect();
+    mongoConnector = client.db(mongoDatabaseName).collection("features");
   } catch {
-    throw new Error("Failed to connect to MongoDB. Aborting.");
+    throw new Error('Failed to connect to MongoDB instance.');
   }
 }

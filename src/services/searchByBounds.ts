@@ -1,11 +1,11 @@
 // services/searchByBounds
 
-import { dbClient } from "../utilities/database.ts";
+import { mongoConnector } from "../utilities/database.ts";
 
 export { searchByBounds };
 
 async function searchByBounds(bbox: number[], classFilter: string) {
-  return await dbClient.find({
+  return await mongoConnector.find({
     ...(classFilter) ? { "properties.class": classFilter } : {},
     "geometry.coordinates": {
       $geoWithin: {

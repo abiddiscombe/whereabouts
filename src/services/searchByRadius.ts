@@ -1,16 +1,12 @@
 // services/searchByRadius
 
-import { dbClient } from "../utilities/database.ts";
+import { mongoConnector } from "../utilities/database.ts";
 
 export { searchByRadius };
 
-async function searchByRadius(
-  geom: number[],
-  distance: number,
-  classFilter: string,
-) {
-  return await dbClient.find({
-    ...(classFilter) ? { "properties.class": classFilter } : {},
+async function searchByRadius(geom: number[], distance: number, filter: string) {
+  return await mongoConnector.find({
+    ...(filter) ? { "properties.class": filter } : {},
     "geometry.coordinates": {
       $near: {
         $geometry: {

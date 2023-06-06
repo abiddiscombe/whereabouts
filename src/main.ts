@@ -4,7 +4,7 @@
 // https://github.com/abiddiscombe/whereabouts
 
 import { Application, Router } from "oak";
-import { initializeDbClient } from "./utilities/database.ts";
+import { initializeMongoConnector } from "./utilities/database.ts";
 
 import { metadata } from "./middlewares/metadata.ts";
 import { auth, initializeAuth } from "./middlewares/auth.ts";
@@ -16,7 +16,7 @@ import { features } from "./controllers/features.ts";
 
 initializeAuth();
 initializeCors();
-await initializeDbClient();
+await initializeMongoConnector();
 
 const server = new Application();
 const router = new Router();
