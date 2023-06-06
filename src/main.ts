@@ -7,6 +7,7 @@ import { Application, Router } from "oak";
 import { initializeMongoConnector } from "./utilities/database.ts";
 
 import { metadata } from "./middlewares/metadata.ts";
+import { notFound } from "./middlewares/notFound.ts";
 import { auth, initializeAuth } from "./middlewares/auth.ts";
 import { cors, initializeCors } from "./middlewares/cors.ts";
 
@@ -30,6 +31,7 @@ server.use(auth);
 server.use(metadata);
 server.use(router.routes());
 server.use(router.allowedMethods());
+server.use(notFound);
 
 console.info("WHEREABOUTS API Server Started.");
 console.info("Listening on http://127.0.0.1:8080.");
