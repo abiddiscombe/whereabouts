@@ -5,16 +5,19 @@
 
 import { Application, Router } from 'oak';
 import { initializeMongoConnector } from './utilities/database.ts';
-import { metadata } from './middlewares/metadata.ts';
-import { notFound } from './middlewares/notFound.ts';
-import { auth, initializeAuth } from './middlewares/auth.ts';
-import { cors, initializeCors } from './middlewares/cors.ts';
+
+import { http404Middleware } from './middlewares/http404.ts';
+import { requestLogMiddleware } from './middlewares/requestLog.ts';
+import { metaMiddleware } from './middlewares/meta.ts';
+import { authMiddleware, initAuthMiddleware} from './middlewares/auth.ts';
+import { corsMiddleware, initCorsMiddleware } from './middlewares/cors.ts';
+
 import { root } from './controllers/root.ts';
 import { stats } from './controllers/stats.ts';
 import { features } from './controllers/features.ts';
 
-initializeAuth();
-initializeCors();
+initAuthMiddleware();
+initCorsMiddleware();
 await initializeMongoConnector();
 
 const server = new Application();
@@ -24,12 +27,13 @@ router.get('/', root);
 router.get('/stats', stats);
 router.get('/features', features);
 
-server.use(cors);
-server.use(auth);
-server.use(metadata);
+server.use(corsMiddleware);
+server.use(authMiddleware);
+server.use(metaMiddleware);
 server.use(router.routes());
 server.use(router.allowedMethods());
-server.use(notFound);
+server.use(http404Middleware);
+server.use(requestLogMiddleware);
 
 server.addEventListener('listen', ({ secure, hostname, port }) => {
   const protocol = secure ? 'https' : 'http';

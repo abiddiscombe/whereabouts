@@ -5,7 +5,7 @@ const _auth = {
 };
 
 // deno-lint-ignore no-explicit-any
-export async function auth(ctx: any, next: any) {
+export async function authMiddleware(ctx: any, next: any) {
   if (!_auth.token) {
     await next();
     return;
@@ -27,7 +27,7 @@ export async function auth(ctx: any, next: any) {
   };
 }
 
-export function initializeAuth() {
+export function initAuthMiddleware() {
   const token = Deno.env.get('AUTH_TOKEN');
   if (token) {
     if (token.length < 20) {

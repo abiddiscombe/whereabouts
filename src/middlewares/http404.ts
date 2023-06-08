@@ -1,7 +1,7 @@
 // src/middlewares/notFound.ts
 
 // deno-lint-ignore no-explicit-any
-export function notFound(ctx: any) {
+export async function http404Middleware(ctx: any, next:any) {
   ctx.response.status = 404;
   ctx.response.body = {
     ...ctx.state.metadata,
@@ -10,4 +10,5 @@ export function notFound(ctx: any) {
       desc: 'Resource not found. Please check your URL.',
     },
   };
+  await next();
 }

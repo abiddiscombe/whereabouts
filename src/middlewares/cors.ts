@@ -6,14 +6,14 @@ const _cors = {
 };
 
 // deno-lint-ignore no-explicit-any
-export async function cors(ctx: any, next: any) {
+export async function corsMiddleware(ctx: any, next: any) {
   if (_cors.enabled) {
     ctx.response.headers.set('Access-Control-Allow-Origin', _cors.origin);
   }
   await next();
 }
 
-export function initializeCors() {
+export function initCorsMiddleware() {
   const userOrigin = Deno.env.get('CORS_ORIGIN') || '';
   if (userOrigin === '*') {
     _cors.enabled = true;
