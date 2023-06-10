@@ -10,7 +10,6 @@
   "imports": {
     "oak": "https://deno.land/x/oak/mod.ts",
     "mongodb": "npm:mongodb",
-    "turf-area": "npm:@turf/area",
-    "turf-bboxPolygon": "npm:@turf/bbox-polygon"
+    "@turf/turf": "npm:@turf/turf"
   }
 }

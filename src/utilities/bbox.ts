@@ -1,10 +1,9 @@
 // src/utilities/bbox.ts
 
-import area from 'turf-area';
-import bboxPolygon from 'turf-bboxPolygon';
+import * as turf from "@turf/turf";
 
 export function bboxTooLarge(bbox: number[]) {
-  const featurePolygon = bboxPolygon(bbox);
-  const featurePolygonArea = area(featurePolygon);
+  const featurePolygon = turf.bboxPolygon(bbox);
+  const featurePolygonArea = turf.area(featurePolygon);
   return (featurePolygonArea >= 1000000) ? true : false;
 }
