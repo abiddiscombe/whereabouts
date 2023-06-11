@@ -26,12 +26,18 @@ router.get('/features', features);
 
 server.use(corsMiddleware);
 server.use(authMiddleware);
+server.use(requestLogMiddleware);
 server.use(router.routes());
 server.use(router.allowedMethods());
 server.use(http404Middleware);
-server.use(requestLogMiddleware);
 
-server.addEventListener('listen', ({ secure, hostname, port }) => {
+interface eventListenerArgs {
+    secure: boolean;
+    hostname: string;
+    port: number;
+}
+
+server.addEventListener('listen', ({ secure, hostname, port }: eventListenerArgs) => {
     const protocol = secure ? 'https' : 'http';
     hostname = hostname ?? 'localhost';
     console.info('[INFO] WHEREABOUTS API Server Started.');

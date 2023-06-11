@@ -3,7 +3,6 @@
 import { bboxTooLarge } from '../utilities/bbox.ts';
 import { searchByRadius } from '../services/searchByRadius.ts';
 import { searchByBounds } from '../services/searchByBounds.ts';
-import { stringToFloatArray } from '../utilities/conversion.ts';
 
 // deno-lint-ignore no-explicit-any
 export async function features(ctx: any) {
@@ -22,30 +21,42 @@ export async function features(ctx: any) {
 
     if (rawParams.bbox && rawParams.radius) {
         ctx.response.status = 406;
-        ctx.response.body = { ...resHeading, error: 'Please provide either a bbox or radius search query.' };
+        ctx.response.body = {
+            ...resHeading,
+            error: 'Please provide either a bbox or radius search query.',
+        };
         return;
     }
 
     if (rawParams.bbox) {
         const response = await _handleBboxQuery(rawParams.bbox, rawParams.filter);
         ctx.response.status = response.status;
-        ctx.response.body = { ...resHeading, ...response.body };
+        ctx.response.body = {
+            ...resHeading,
+            ...response.body,
+        };
         return;
     }
 
     if (rawParams.radius) {
         const response = await _handleRadiusQuery(rawParams.radius, rawParams.filter);
         ctx.response.status = response.status;
-        ctx.response.body = { ...resHeading, ...response.body };
+        ctx.response.body = {
+            ...resHeading,
+            ...response.body,
+        };
         return;
     }
 
     ctx.response.status = 406;
-    ctx.response.body = { ...resHeading, error: 'Please provide one method (bbox or radius) to search by.' };
+    ctx.response.body = {
+        ...resHeading,
+        error: 'Please provide one method (bbox or radius) to search by.',
+    };
 }
 
 async function _handleBboxQuery(bbox: string, filter: string) {
-    const bboxFiltered = stringToFloatArray(bbox);
+    const bboxFiltered = _stringToFloatArray(bbox);
 
     if (bboxFiltered.length !== 4) {
         return {
@@ -66,14 +77,12 @@ async function _handleBboxQuery(bbox: string, filter: string) {
     }
 
     try {
-        const features: any = await searchByBounds(bboxFiltered, filter);
+        const features = await searchByBounds(bboxFiltered, filter);
         return {
             status: 200,
             body: {
                 query: {
-                    ...(features.length === 1000)
-                        ? { warning: 'Feature limit reached. Additional features may be available' }
-                        : {},
+                    ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
                     bbox: bbox,
                 },
@@ -92,14 +101,14 @@ async function _handleBboxQuery(bbox: string, filter: string) {
 }
 
 async function _handleRadiusQuery(radius: string, filter: string) {
-    const center = stringToFloatArray(radius);
-    const distance = (center.length === 3) ? center.pop() : 1000;
+    const center = _stringToFloatArray(radius);
+    const distance: number = (center.length === 3) ? center.pop() : 1000;
 
     if (center.length !== 2) {
         return {
             status: 401,
             body: {
-                error: 'Radius (radius) invalid.',
+                error: 'Radius parameter is invalid.',
             },
         };
     }
@@ -114,14 +123,12 @@ async function _handleRadiusQuery(radius: string, filter: string) {
     }
 
     try {
-        const features: any = await searchByRadius(center, distance, filter);
+        const features = await searchByRadius(center, distance, filter);
         return {
             status: 200,
             body: {
                 query: {
-                    ...(features.length === 1000)
-                        ? { warning: 'Feature limit reached. Additional features may be available' }
-                        : {},
+                    ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
                     radius: {
                         center: center,
@@ -140,4 +147,21 @@ async function _handleRadiusQuery(radius: string, filter: string) {
             },
         };
     }
+}
+
+function _stringToFloatArray(input: string) {
+    try {
+        return input.split(',').map((element) => {
+            if (element.toUpperCase() != element) {
+                throw new Error();
+            }
+            return parseFloat(element);
+        });
+    } catch {
+        return [];
+    }
+}
+
+function _featureLimitWarning(numOfFeatures: number) {
+    return (numOfFeatures === 1000) ? { warning: 'Feature limit reached. Additional features may be available' } : {};
 }

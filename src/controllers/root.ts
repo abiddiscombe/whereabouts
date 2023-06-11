@@ -3,7 +3,7 @@
 import { getFeatureCount } from '../services/getFeatureCount.ts';
 
 // deno-lint-ignore no-explicit-any
-export async function root(ctx: any) {
+export async function root(ctx: any, next: any) {
     const totalFeatures = await _featureCount();
 
     ctx.response.body = {
