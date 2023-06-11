@@ -1,30 +1,32 @@
 // src/controllers/root.ts
 
-import { newHeader } from "../utilities/header.ts";
-import { sessionCache } from "../utilities/session.ts";
-
-export { root };
+import { getFeatureCount } from '../services/getFeatureCount.ts';
 
 // deno-lint-ignore no-explicit-any
-function root(ctx: any) {
-  sessionCache.totalLifetimeRequests.root += 1;
-  const res = newHeader("Service Capabilities / Endpoints");
+export async function root(ctx: any, next: any) {
+    const totalFeatures = await _featureCount();
 
-  ctx.response.body = {
-    ...res,
-    capabilities: [
-      {
-        href: "/stats",
-        methods: ["GET"],
-        description:
-          "Returns statistics related to service and dataset health.",
-      },
-      {
-        href: "/features",
-        methods: ["GET"],
-        description:
-          "Returns dataset features as determined by client search parameters.",
-      },
-    ],
-  };
+    ctx.response.body = {
+        time: Math.floor(Date.now() / 1000),
+        host: 'Whereabouts API',
+        info: {
+            version: '2.0.0',
+            totalFeatures: totalFeatures,
+        },
+        links: [
+            {
+                name: 'Feature Search',
+                href: '/features',
+                desc: 'Returns GeoJSON features. Supports either bbox or radial search methods.',
+            },
+        ],
+    };
+}
+
+async function _featureCount() {
+    try {
+        return await getFeatureCount();
+    } catch {
+        return null;
+    }
 }

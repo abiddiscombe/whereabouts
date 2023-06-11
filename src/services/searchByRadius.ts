@@ -1,24 +1,22 @@
 // services/searchByRadius
 
-import { clientFeatures } from "../utilities/database.ts";
+import { mongoConnector } from '../utilities/database.ts';
 
-export { searchByRadius };
-
-async function searchByRadius(
-  geom: number[],
-  distance: number,
-  classFilter: string,
+export async function searchByRadius(
+    geom: number[],
+    distance: number,
+    filter: string,
 ) {
-  return await clientFeatures.find({
-    ...(classFilter) ? { "properties.class": classFilter } : {},
-    "geometry.coordinates": {
-      $near: {
-        $geometry: {
-          type: "Point",
-          coordinates: [geom[0], geom[1]],
+    return await mongoConnector.find({
+        ...(filter) ? { 'properties.class': filter } : {},
+        'geometry.coordinates': {
+            $near: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates: [geom[0], geom[1]],
+                },
+                $maxDistance: distance,
+            },
         },
-        $maxDistance: distance,
-      },
-    },
-  }).toArray();
+    }).limit(1000).toArray();
 }

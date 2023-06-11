@@ -1,39 +1,27 @@
 // utilities/database.ts
 
-import { MongoClient } from "mongo";
-
-export { clientAuthentication, clientFeatures, initDatabaseClients };
+import { MongoClient } from 'mongodb';
 
 // deno-lint-ignore no-explicit-any
-let clientFeatures: any;
-// deno-lint-ignore no-explicit-any
-let clientAuthentication: any;
+export let mongoConnector: any;
 
-async function initDatabaseClients() {
-  if (clientFeatures) { // assume clientAuthentication shares state
-    console.warn("The clients are already initialised. Aborting.");
-    return;
-  }
+export async function initializeMongoConnector() {
+    if (mongoConnector) return;
+    const mongoConnString = Deno.env.get('MONGO_URL') || '';
+    const mongoDatabaseName = Deno.env.get('MONGO_DATABASE') || '';
 
-  const uri = Deno.env.get("MONGO_URI") || undefined;
+    if (!mongoConnString) {
+        throw new Error('Environment Variable \'MONGO_URL\' is missing.');
+    } else if (!mongoDatabaseName) {
+        throw new Error('Environment Variable \'MONGO_DATABASE\' is missing.');
+    }
 
-  if (!uri) {
-    throw new Error(
-      "The environment variable 'MONGO_URI' was not found. Aborting.",
-    );
-  }
-
-  try {
-    const mongoFeatures = new MongoClient();
-    await mongoFeatures.connect(uri);
-    clientFeatures = await mongoFeatures.database().collection("features");
-
-    const mongoAuthentication = new MongoClient();
-    await mongoAuthentication.connect(uri);
-    clientAuthentication = await mongoAuthentication.database().collection(
-      "authentication",
-    );
-  } catch {
-    throw new Error("Failed to connect to MongoDB. Aborting.");
-  }
+    try {
+        const client = new MongoClient(mongoConnString);
+        await client.connect();
+        console.info('[INFO] Successfully connected to MongoDB Instance.');
+        mongoConnector = client.db(mongoDatabaseName).collection('features');
+    } catch {
+        throw new Error('Failed to connect to MongoDB instance.');
+    }
 }

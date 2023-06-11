@@ -1,16 +1,17 @@
 {
   "fmt": {
-    "include": ["src/"]
+    "include": ["src/"],
+    "singleQuote": true,
+    "lineWidth": 120,
+    "indentWidth": 4
   },
   "tasks": {
-    "dev": "deno run --allow-net --allow-env --watch src/main.ts",
-    "startProd": "deno run --allow-net --allow-env --watch src/main.ts"
+    "dev": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease --watch src/main.ts",
+    "startProd": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease src/main.ts"
   },
   "imports": {
     "oak": "https://deno.land/x/oak/mod.ts",
-    "cors": "https://deno.land/x/cors/mod.ts",
-    "mongo": "https://deno.land/x/mongo/mod.ts",
-    "turf-area": "npm:@turf/area",
-    "turf-bboxPolygon": "npm:@turf/bbox-polygon"
+    "mongodb": "npm:mongodb",
+    "@turf/turf": "npm:@turf/turf"
   }
 }

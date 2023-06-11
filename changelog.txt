@@ -1,5 +1,0 @@
-Version 1.0.0
-- The initital release of the Whereabouts API Server.
-- Support for geospatial queries: radius and bbox.
-- Support for filtering based on feature class.
-- Support for key-based authentication.
