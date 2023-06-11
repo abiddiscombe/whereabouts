@@ -1,38 +1,27 @@
 # Whereabouts API Server
-A Geospatial (GeoJSON) Point Feature API.  
-Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com).
-
-## Demo
-You can try Whereabouts using [this demo](https://whereabouts-demo.archiebiddiscombe.net) which is loaded with the [Ordnance Survey OpenNames](https://osdatahub.os.uk/docs/names/overview) dataset.  
-Use the API key `demo-testing` where needed. Please play fair, this demo is for experimental use only.
+A Geospatial (GeoJSON) Point Feature API with support for radial (up to 1km search distance) and bounding box queries. Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com) as a personal introduction to geospatial API development.
 
 ## API Endpoints
 
 `/`  
-Lists the API's capabilities.
-
-`/stats`  
-Returns statistics regarding the server and database.
+Lists metadata about the API service and its endpoints.
 
 `/features`  
-Requests must include a valid API key (`key`). Returns a GeoJSON FeatureCollection consisting of the features aggregated from one of the following geospatial search methods:
+Returns a GeoJSON FeatureCollection consisting of the features matching from one of the following geospatial search methods, supplied as a query parameter.
 
 - Radius: `radius=lng,lat,distance`  
-*A distance value is optional. It must be an integer between 1 and 1000 meters.*
+*Specifying a distance is optional, with the default value of 1000 meters. The value must be an integer between 1 and 1000 meters.*
 
 - Bounding Box: `bbox=1,2,3,4`  
 *A valid Bounding Box with an area < 1km<sup>2</sup>. Bounding Boxes can be calculated using [bboxfinder.com](http://bboxfinder.com).*
 
-The response of a geospatial search can be further customised using the `filter` query which matches against a feature's `class` property. Only exact matches are supported.
+The response of a geospatial search can be further constrained using the `filter` query parameter which matches against a feature's `class` property. Only exact matches are supported.
 
-## Getting Started
-If you wish to self-host the Whereabouts API Server, the following instructions will help you get started. You'll need Docker to run the server and a MongoDB server to store data.
+## Deployment Instructions
+You'll need Docker to run the API server, and a MongoDB server to store the point dataset. If you're interested in giving it a go, the [Ordnance Survey Open Names](https://osdatahub.os.uk/docs/names/overview) point-based dataset is a suitable example.
 
 ### Database Setup
-The server container connects to the MongoDB instance to store both authentication parameters (API keys) and GeoJSON features in two seperate collections:
-
-#### features
-The `features` collection must contain valid GeoJSON features:
+The server container connects to the MongoDB instance to store GeoJSON features. The `features` collection must contain valid GeoJSON features, and have a valid geospatial index (`2Dsphere`) enabled on the `coordinates` property.
 
 ```js
 {
@@ -49,26 +38,18 @@ The `features` collection must contain valid GeoJSON features:
 }
 ```
 
-The `features` collection must have a geospatial index (`2Dsphere`) on the `coordinates` property to enable MongoDB's geospatial capabilities.
+### Server Deployment
+The server image is [published to Docker Hub](https://hub.docker.com/r/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`. The server accepts the following environment variables:
 
-#### authentication
-The `authentication` collection holds API keys and whether they should be accepted by the server. Each entry represents a unique API key.
-
-```js
-{
-    key: "the-key-goes-here",
-    enabled: true // or false
-}
-```
-
-### Deployment
-The server image is [published to Docker Hub](https://hub.docker.com/r/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`.
-
-> The image is currently limited to `arm64` architectures (suitable for Apple M1/M2 or Raspberry Pi 4).
-> If there is demand for an `amd64` build, this can be investigated in the future.
-
-The server requires the following environment variables:
-
-- `MONGO_URI`  
+- `MONGO_URL`  
 A valid connection string to your MongoDB database.  
-It will look something like: `mongodb+srv://username:password@mongodb.example.com/databaseName?replicaSet=serverName&tls=true&authMechanism=SCRAM-SHA-1&authSource=admin`.
+It will look something like: `mongodb+srv://username:password@mongodb.example.com?replicaSet=serverName&tls=true&authMechanism=SCRAM-SHA-1&authSource=admin`.
+
+- `MONGO_DATABASE`   
+the name of a database on the MongoDB server instance. The database must contain the neccessary point features in a collection named `features`.
+
+- `CORS_ORIGIN` (Optional)  
+A valid domain by which the server's CORS policy should be whitelisted to (e.g. `example.com`). A value of `*` will enable CORS for all origins. **Not supplying a value will disable CORS.**
+
+- `AUTH_TOKEN` (Optional)  
+Accepts a string for use as a password via *bearer token authentication*. The token must have a minimum length of 20 characters. This capability is designed for situations where the server is exposed via an API gateway but still reachable by third-parties. **If a token is not supplied, authentication will be disabled.**
