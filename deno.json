@@ -7,7 +7,7 @@
   },
   "tasks": {
     "dev": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease --watch src/main.ts",
-    "startProd": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease --watch src/main.ts"
+    "startProd": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease src/main.ts"
   },
   "imports": {
     "oak": "https://deno.land/x/oak/mod.ts",
