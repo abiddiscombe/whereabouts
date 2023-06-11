@@ -3,20 +3,20 @@
 import { mongoConnector } from '../utilities/database.ts';
 
 export async function searchByRadius(
-  geom: number[],
-  distance: number,
-  filter: string,
+    geom: number[],
+    distance: number,
+    filter: string,
 ) {
-  return await mongoConnector.find({
-    ...(filter) ? { 'properties.class': filter } : {},
-    'geometry.coordinates': {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: [geom[0], geom[1]],
+    return await mongoConnector.find({
+        ...(filter) ? { 'properties.class': filter } : {},
+        'geometry.coordinates': {
+            $near: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates: [geom[0], geom[1]],
+                },
+                $maxDistance: distance,
+            },
         },
-        $maxDistance: distance,
-      },
-    },
-  }).limit(1000).toArray();
+    }).limit(1000).toArray();
 }

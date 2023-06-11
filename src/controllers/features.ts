@@ -12,8 +12,8 @@ export async function features(ctx: any) {
         radius: ctx.request.url.searchParams.get('radius') || '',
         filter: ctx.request.url.searchParams.get('filter')
             ? ctx.request.url.searchParams.get('filter').toLowerCase()
-            : ''
-    }
+            : '',
+    };
 
     const resHeading = {
         time: Math.floor(Date.now() / 1000),
@@ -22,12 +22,10 @@ export async function features(ctx: any) {
 
     if (rawParams.bbox && rawParams.radius) {
         ctx.response.status = 406;
-        ctx.response.body = { ...resHeading,
-            error: 'Please provide either a bbox or radius search query.'
-        };
+        ctx.response.body = { ...resHeading, error: 'Please provide either a bbox or radius search query.' };
         return;
     }
-    
+
     if (rawParams.bbox) {
         const response = await _handleBboxQuery(rawParams.bbox, rawParams.filter);
         ctx.response.status = response.status;
@@ -43,9 +41,7 @@ export async function features(ctx: any) {
     }
 
     ctx.response.status = 406;
-    ctx.response.body = { ...resHeading,
-        error: 'Please provide one method (bbox or radius) to search by.'
-    }
+    ctx.response.body = { ...resHeading, error: 'Please provide one method (bbox or radius) to search by.' };
 }
 
 async function _handleBboxQuery(bbox: string, filter: string) {
@@ -76,23 +72,21 @@ async function _handleBboxQuery(bbox: string, filter: string) {
             body: {
                 query: {
                     ...(features.length === 1000)
-                        ? { warning: "Feature limit reached. Additional features may be available" }
+                        ? { warning: 'Feature limit reached. Additional features may be available' }
                         : {},
-                    ...(filter)
-                        ? { filter: filter }
-                        : {},
+                    ...(filter) ? { filter: filter } : {},
                     bbox: bbox,
                 },
                 type: 'FeatureCollection',
-                features: features
-            }
+                features: features,
+            },
         };
     } catch {
         return {
             status: 500,
             body: {
-                error: 'Internal server error. Please try again later.'
-            }
+                error: 'Internal server error. Please try again later.',
+            },
         };
     }
 }
@@ -126,26 +120,24 @@ async function _handleRadiusQuery(radius: string, filter: string) {
             body: {
                 query: {
                     ...(features.length === 1000)
-                        ? { warning: "Feature limit reached. Additional features may be available" }
+                        ? { warning: 'Feature limit reached. Additional features may be available' }
                         : {},
-                    ...(filter)
-                        ? { filter: filter }
-                        : {},
+                    ...(filter) ? { filter: filter } : {},
                     radius: {
                         center: center,
-                        distance: distance
-                    }
+                        distance: distance,
+                    },
                 },
                 type: 'FeatureCollection',
-                features: features
-            }
+                features: features,
+            },
         };
     } catch {
         return {
             status: 500,
             body: {
-                error: 'Internal server error. Please try again later.'
-            }
+                error: 'Internal server error. Please try again later.',
+            },
         };
     }
 }
