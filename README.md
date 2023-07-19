@@ -1,55 +1,46 @@
-# Whereabouts API Server
-A Geospatial (GeoJSON) Point Feature API with support for radial (up to 1km search distance) and bounding box queries. Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com) as a personal introduction to geospatial API development.
+# Whereabouts API
+🗺️📍 A GeoJSON Point Feature API with support for feature queries based on `radial` or `bbox` input. Built with [Deno](https://deno.com/runtime), [Oak](https://oakserver.github.io/oak), and [MongoDB](https://www.mongodb.com) as a personal introduction to geospatial API development. *I am not actively maintaining this project.*
 
-## API Endpoints
+![Screenshot of a Whereabouts API response](media/banner.png)
+
+In this screenshot, the database I was using was populated with Ordnance Survey's [Open Names](https://osdatahub.os.uk/docs/names/overview) POI dataset consisting of >3 million features. The Whereabouts API could query this data and return a result of up-to 1,000 features in less than a second.
+
+The Whereabouts API uses [MongoDB](https://www.mongodb.com) to store GeoJSON features as individual documents. Each document can hold a single point feature (e.g. a POI) and the following property attributes: 
+- An `fid` (Feature ID) that is unique to a feature and thus can be used to identify it.
+- A feature `name` value which can be any string.
+- A `class` value which can be used to filter queries and group features into clusters.
+
+Geospatial capabilities are provided by setting MongoDB's `2Dsphere` index on the `coordinates` property. A user can thus query the data using either a radius (a point and distance around it) or bounding box. The server facilitates request validation and error handling.
+
+## Endpoints
 
 `/`  
-Lists metadata about the API service and its endpoints.
+Lists metadata about the API and its endpoints.
 
 `/features`  
-Returns a GeoJSON FeatureCollection consisting of the features matching from one of the following geospatial search methods, supplied as a query parameter.
+Returns a GeoJSON FeatureCollection consisting of the features selected from one of the following geospatial search methods, each supplied as a query parameter.
 
 - Radius: `radius=lng,lat,distance`  
-*Specifying a distance is optional, with the default value of 1000 meters. The value must be an integer between 1 and 1000 meters.*
+*Specifying a distance is optional with a default value of 1000 meters. The value must be an integer between 1 and 1000 meters.*
 
 - Bounding Box: `bbox=1,2,3,4`  
 *A valid Bounding Box with an area < 1km<sup>2</sup>. Bounding Boxes can be calculated using [bboxfinder.com](http://bboxfinder.com).*
 
-The response of a geospatial search can be further constrained using the `filter` query parameter which matches against a feature's `class` property. Only exact matches are supported.
+The response of a geospatial search can be  constrained using the `filter` query parameter which matches against a feature's `class` property. Only exact matches are currently supported.
 
 ## Deployment Instructions
-You'll need Docker to run the API server, and a MongoDB server to store the point dataset. If you're interested in giving it a go, the [Ordnance Survey Open Names](https://osdatahub.os.uk/docs/names/overview) point-based dataset is a suitable example.
+> You'll need Docker to run the API server, and a MongoDB database to store the point dataset.
 
-### Database Setup
-The server container connects to the MongoDB instance to store GeoJSON features. The `features` collection must contain valid GeoJSON features, and have a valid geospatial index (`2Dsphere`) enabled on the `coordinates` property.
-
-```js
-{
-    type: "Feature",
-    properties: {
-        fid: "a valid feature identifer",
-        name: "the feature name",
-        class: "a class for the feature"
-    },
-    geometry: {
-        type: "Point",
-        coordinates: [lng, lat]
-    }
-}
-```
-
-### Server Deployment
-The server image is [published to Docker Hub](https://hub.docker.com/r/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`. The server accepts the following environment variables:
+The server image is [published to Docker Hub](https://hub.docker.com/r/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`. The image accepts the following environment variables:
 
 - `MONGO_URL`  
-A valid connection string to your MongoDB database.  
-It will look something like: `mongodb+srv://username:password@mongodb.example.com?replicaSet=serverName&tls=true&authMechanism=SCRAM-SHA-1&authSource=admin`.
+A valid connection string to your MongoDB database, something like: `mongodb+srv://uname:pword@example.com`.
 
 - `MONGO_DATABASE`   
-the name of a database on the MongoDB server instance. The database must contain the neccessary point features in a collection named `features`.
+The name of the database which contains the point features (in a collection named `features`).
 
 - `CORS_ORIGIN` (Optional)  
-A valid domain by which the server's CORS policy should be whitelisted to (e.g. `example.com`). A value of `*` will enable CORS for all origins. **Not supplying a value will disable CORS.**
+**By default, CORS is disabled**. A valid domain can be provided to enable CORS, or alternatively, supply a wildcard `*` to enable CORS for all origins.
 
 - `AUTH_TOKEN` (Optional)  
-Accepts a string for use as a password via *bearer token authentication*. The token must have a minimum length of 20 characters. This capability is designed for situations where the server is exposed via an API gateway but still reachable by third-parties. **If a token is not supplied, authentication will be disabled.**
+Accepts a string which will be set as a bearer token, required across all endpoints. The string must have a length of at least 20 characters. This capability is designed for situations where the server is exposed via an API gateway but still reachable on the public internet.
