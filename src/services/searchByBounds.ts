@@ -1,5 +1,4 @@
-// services/searchByBounds
-
+// searchByBounds.ts
 import { mongoConnector } from '../utilities/database.ts';
 
 export async function searchByBounds(bbox: number[], classFilter: string) {

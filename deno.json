@@ -1,4 +1,4 @@
-{
+{ 
   "fmt": {
     "include": ["src/"],
     "singleQuote": true,
@@ -10,7 +10,8 @@
     "startProd": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease src/main.ts"
   },
   "imports": {
-    "oak": "https://deno.land/x/oak/mod.ts",
+    "hono": "https://deno.land/x/hono@v3.4.2/mod.ts",
+    "honoMiddleware": "https://deno.land/x/hono@v3.4.2/middleware.ts",
     "mongodb": "npm:mongodb",
     "@turf/turf": "npm:@turf/turf"
   }

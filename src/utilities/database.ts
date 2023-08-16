@@ -1,5 +1,4 @@
-// utilities/database.ts
-
+// database.ts
 import { MongoClient } from 'mongodb';
 
 // deno-lint-ignore no-explicit-any

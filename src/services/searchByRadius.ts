@@ -1,5 +1,4 @@
-// services/searchByRadius
-
+// searchByRadius.ts
 import { mongoConnector } from '../utilities/database.ts';
 
 export async function searchByRadius(

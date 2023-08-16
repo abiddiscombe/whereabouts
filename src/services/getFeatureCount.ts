@@ -1,5 +1,4 @@
-// src/services/getFeatureCount.ts
-
+// getFeatureCount.ts
 import { mongoConnector } from '../utilities/database.ts';
 
 export async function getFeatureCount() {

@@ -1,86 +1,58 @@
-// controllers/features.ts
-
+// features.ts
+import { type Context, Hono, HTTPException } from 'hono';
 import { bboxTooLarge } from '../utilities/bbox.ts';
 import { searchByRadius } from '../services/searchByRadius.ts';
 import { searchByBounds } from '../services/searchByBounds.ts';
 
-// deno-lint-ignore no-explicit-any
-export async function features(ctx: any) {
-    const rawParams = {
-        bbox: ctx.request.url.searchParams.get('bbox') || '',
-        radius: ctx.request.url.searchParams.get('radius') || '',
-        filter: ctx.request.url.searchParams.get('filter')
-            ? ctx.request.url.searchParams.get('filter').toLowerCase()
-            : '',
-    };
+export const featuresController = new Hono();
 
-    const resHeading = {
+featuresController.get('/', async (c: Context) => {
+    const bbox = c.req.query('bbox') || '';
+    const radius = c.req.query('radius') || '';
+    const filter = c.req.query('filter') || '';
+
+    c.set('header', {
         time: Math.floor(Date.now() / 1000),
         host: 'Whereabouts API > Feature Search',
-    };
+    });
 
-    if (rawParams.bbox && rawParams.radius) {
-        ctx.response.status = 406;
-        ctx.response.body = {
-            ...resHeading,
-            error: 'Please provide either a bbox or radius search query.',
-        };
-        return;
+    if (bbox && radius) {
+        throw new HTTPException(406, {
+            message: JSON.stringify({
+                ...c.get('header'),
+                error: 'Please provide either a bbox or radius search query.',
+            }),
+        });
     }
 
-    if (rawParams.bbox) {
-        const response = await _handleBboxQuery(rawParams.bbox, rawParams.filter);
-        ctx.response.status = response.status;
-        ctx.response.body = {
-            ...resHeading,
-            ...response.body,
-        };
-        return;
-    }
+    if (bbox) {
+        const bboxFiltered = _stringToFloatArray(bbox);
 
-    if (rawParams.radius) {
-        const response = await _handleRadiusQuery(rawParams.radius, rawParams.filter);
-        ctx.response.status = response.status;
-        ctx.response.body = {
-            ...resHeading,
-            ...response.body,
-        };
-        return;
-    }
+        // check length is acceptable
+        if (bboxFiltered.length !== 4) {
+            throw new HTTPException(401, {
+                message: JSON.stringify({
+                    ...c.get('header'),
+                    error: 'Bounding Box (bbox) invalid.',
+                }),
+            });
+        }
 
-    ctx.response.status = 406;
-    ctx.response.body = {
-        ...resHeading,
-        error: 'Please provide one method (bbox or radius) to search by.',
-    };
-}
+        // check area within the hard limit
+        if (bboxTooLarge(bboxFiltered)) {
+            throw new HTTPException(401, {
+                message: JSON.stringify({
+                    ...c.get('header'),
+                    error: 'Bounding Box too large. Maximum size is 1 km2',
+                }),
+            });
+        }
 
-async function _handleBboxQuery(bbox: string, filter: string) {
-    const bboxFiltered = _stringToFloatArray(bbox);
-
-    if (bboxFiltered.length !== 4) {
-        return {
-            status: 401,
-            body: {
-                error: 'Bounding Box (bbox) invalid.',
-            },
-        };
-    }
-
-    if (bboxTooLarge(bboxFiltered)) {
-        return {
-            status: 401,
-            body: {
-                error: 'Bounding Box too large. Maximum size is 1 km2',
-            },
-        };
-    }
-
-    try {
-        const features = await searchByBounds(bboxFiltered, filter);
-        return {
-            status: 200,
-            body: {
+        // execute request
+        try {
+            const features = await searchByBounds(bboxFiltered, filter);
+            return c.json({
+                ...c.get('header'),
                 query: {
                     ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
@@ -88,66 +60,77 @@ async function _handleBboxQuery(bbox: string, filter: string) {
                 },
                 type: 'FeatureCollection',
                 features: features,
-            },
-        };
-    } catch {
-        return {
-            status: 500,
-            body: {
-                error: 'Internal server error. Please try again later.',
-            },
-        };
-    }
-}
-
-async function _handleRadiusQuery(radius: string, filter: string) {
-    const center = _stringToFloatArray(radius);
-    const distance: number = (center.length === 3) ? center.pop() : 1000;
-
-    if (center.length !== 2) {
-        return {
-            status: 401,
-            body: {
-                error: 'Radius parameter is invalid.',
-            },
-        };
+            });
+        } catch {
+            throw new HTTPException(500, {
+                message: JSON.stringify({
+                    ...c.get('header'),
+                    error: 'Internal server error. Please try again later.',
+                }),
+            });
+        }
     }
 
-    if (distance < 1 || distance > 1000) {
-        return {
-            status: 401,
-            body: {
-                error: 'Distance outside of acceptable range (1 to 1000 meters).',
-            },
-        };
-    }
+    if (radius) {
+        const centerFiltered = _stringToFloatArray(radius);
+        const distanceFiltered: number = (centerFiltered.length === 3) ? centerFiltered.pop() : 1000;
 
-    try {
-        const features = await searchByRadius(center, distance, filter);
-        return {
-            status: 200,
-            body: {
+        // check center-point is acceptable
+        if (centerFiltered.length !== 2) {
+            throw new HTTPException(401, {
+                message: JSON.stringify({
+                    ...c.get('header'),
+                    error: 'Radius parameter is invalid.',
+                }),
+            });
+        }
+
+        // check distance is acceptable
+        if (distanceFiltered < 1 || distanceFiltered > 1000) {
+            throw new HTTPException(401, {
+                message: JSON.stringify({
+                    ...c.get('header'),
+                    error: 'Distance outside of acceptable range (1 to 1000 meters).',
+                }),
+            });
+        }
+
+        try {
+            const features = await searchByRadius(
+                centerFiltered,
+                distanceFiltered,
+                filter,
+            );
+            return c.json({
+                ...c.get('header'),
                 query: {
                     ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
                     radius: {
-                        center: center,
-                        distance: distance,
+                        center: centerFiltered,
+                        distance: distanceFiltered,
                     },
                 },
                 type: 'FeatureCollection',
                 features: features,
-            },
-        };
-    } catch {
-        return {
-            status: 500,
-            body: {
-                error: 'Internal server error. Please try again later.',
-            },
-        };
+            });
+        } catch {
+            throw new HTTPException(500, {
+                message: JSON.stringify({
+                    ...c.get('header'),
+                    error: 'Internal server error. Please try again later.',
+                }),
+            });
+        }
     }
-}
+
+    throw new HTTPException(406, {
+        message: JSON.stringify({
+            ...c.get('header'),
+            error: 'Please provide one method (bbox or radius) to search by.',
+        }),
+    });
+});
 
 function _stringToFloatArray(input: string) {
     try {
@@ -163,5 +146,9 @@ function _stringToFloatArray(input: string) {
 }
 
 function _featureLimitWarning(numOfFeatures: number) {
-    return (numOfFeatures === 1000) ? { warning: 'Feature limit reached. Additional features may be available' } : {};
+    return (numOfFeatures === 1000)
+        ? {
+            warning: 'Feature limit reached. Additional features may be available',
+        }
+        : {};
 }
