@@ -1,5 +1,6 @@
 // root.ts
 import { type Context, Hono } from 'hono';
+import { info, endpointDescs } from '../utilities/constants.ts';
 import { getFeatureCount } from '../services/getFeatureCount.ts';
 
 export const rootController = new Hono();
@@ -9,16 +10,16 @@ rootController.get('/', async (c: Context) => {
 
     return c.json({
         time: Math.floor(Date.now() / 1000),
-        host: 'Whereabouts API',
+        host: info.WHEREABOUTS_NAME,
         info: {
-            version: '2.0.0',
+            version: info.WHEREABOUTS_VERSION,
             totalFeatures: totalFeatures,
         },
         links: [
             {
                 name: 'Feature Search',
                 href: '/features',
-                desc: 'Returns GeoJSON features. Supports either bbox or radial search methods.',
+                desc: endpointDescs.features,
             },
         ],
     });

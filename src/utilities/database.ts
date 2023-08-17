@@ -18,7 +18,6 @@ export async function initializeMongoConnector() {
     try {
         const client = new MongoClient(mongoConnString);
         await client.connect();
-        console.info('[INFO] Successfully connected to MongoDB Instance.');
         mongoConnector = client.db(mongoDatabaseName).collection('features');
     } catch {
         throw new Error('Failed to connect to MongoDB instance.');

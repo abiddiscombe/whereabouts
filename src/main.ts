@@ -7,6 +7,7 @@ import { Hono } from 'hono';
 import { bearerAuth, cors, logger } from 'honoMiddleware';
 import { MiddlewareConfig } from './utilities/middleware.ts';
 import { initializeMongoConnector } from './utilities/database.ts';
+import { errors, info } from './utilities/constants.ts';
 
 import { rootController } from './controllers/root.ts';
 import { featuresController } from './controllers/features.ts';
@@ -44,10 +45,10 @@ app.notFound((c) => {
     return c.json({
         error: {
             code: 404,
-            desc: 'Resource not found. Please check your URL.',
+            desc: errors.HTTP_404,
         },
     }, 404);
 });
 
-console.info('[INFO] WHEREABOUTS API Server Started (Port 8080).');
+console.info(`${info.WHEREABOUTS_NAME} (${info.WHEREABOUTS_VERSION}) Server Started`);
 Deno.serve({ port: 8080 }, app.fetch);

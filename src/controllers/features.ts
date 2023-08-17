@@ -1,5 +1,6 @@
 // features.ts
 import { type Context, Hono, HTTPException } from 'hono';
+import { errors, info } from '../utilities/constants.ts';
 import { bboxTooLarge } from '../utilities/bbox.ts';
 import { searchByRadius } from '../services/searchByRadius.ts';
 import { searchByBounds } from '../services/searchByBounds.ts';
@@ -13,7 +14,7 @@ featuresController.get('/', async (c: Context) => {
 
     c.set('header', {
         time: Math.floor(Date.now() / 1000),
-        host: 'Whereabouts API > Feature Search',
+        host: `${info.WHEREABOUTS_NAME} > Feature Search`,
     });
 
     if (bbox && radius) {
@@ -65,7 +66,7 @@ featuresController.get('/', async (c: Context) => {
             throw new HTTPException(500, {
                 message: JSON.stringify({
                     ...c.get('header'),
-                    error: 'Internal server error. Please try again later.',
+                    error: errors.HTTP_500,
                 }),
             });
         }
@@ -118,7 +119,7 @@ featuresController.get('/', async (c: Context) => {
             throw new HTTPException(500, {
                 message: JSON.stringify({
                     ...c.get('header'),
-                    error: 'Internal server error. Please try again later.',
+                    error: errors.HTTP_500,
                 }),
             });
         }
