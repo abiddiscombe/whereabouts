@@ -17,5 +17,9 @@ export async function searchByRadius(
                 $maxDistance: distance,
             },
         },
+    }, {
+        projection: {
+            _id: false
+        }
     }).limit(1000).toArray();
 }
