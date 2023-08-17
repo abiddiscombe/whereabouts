@@ -31,7 +31,7 @@ featuresController.get('/', async (c: Context) => {
 
         // check length is acceptable
         if (bboxFiltered.length !== 4) {
-            throw new HTTPException(401, {
+            throw new HTTPException(406, {
                 message: JSON.stringify({
                     ...c.get('header'),
                     error: 'Bounding Box (bbox) invalid.',
@@ -41,7 +41,7 @@ featuresController.get('/', async (c: Context) => {
 
         // check area within the hard limit
         if (bboxTooLarge(bboxFiltered)) {
-            throw new HTTPException(401, {
+            throw new HTTPException(406, {
                 message: JSON.stringify({
                     ...c.get('header'),
                     error: 'Bounding Box too large. Maximum size is 1 km2',
@@ -78,7 +78,7 @@ featuresController.get('/', async (c: Context) => {
 
         // check center-point is acceptable
         if (centerFiltered.length !== 2) {
-            throw new HTTPException(401, {
+            throw new HTTPException(406, {
                 message: JSON.stringify({
                     ...c.get('header'),
                     error: 'Radius parameter is invalid.',
@@ -88,7 +88,7 @@ featuresController.get('/', async (c: Context) => {
 
         // check distance is acceptable
         if (distanceFiltered < 1 || distanceFiltered > 1000) {
-            throw new HTTPException(401, {
+            throw new HTTPException(406, {
                 message: JSON.stringify({
                     ...c.get('header'),
                     error: 'Distance outside of acceptable range (1 to 1000 meters).',
