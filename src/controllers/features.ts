@@ -74,7 +74,7 @@ featuresController.get('/', async (c: Context) => {
 
     if (radius) {
         const centerFiltered = _stringToFloatArray(radius);
-        const distanceFiltered: number = (centerFiltered.length === 3) ? centerFiltered.pop() : 1000;
+        const distanceFiltered: number = (centerFiltered.length === 3) ? centerFiltered.pop() || 1000 : 1000;
 
         // check center-point is acceptable
         if (centerFiltered.length !== 2) {

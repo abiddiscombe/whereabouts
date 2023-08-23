@@ -1,5 +1,5 @@
 // searchByRadius.ts
-import { mongoConnector } from '../utilities/database.ts';
+import { mongoConnector } from '../database/database.ts';
 
 export async function searchByRadius(
     geom: number[],

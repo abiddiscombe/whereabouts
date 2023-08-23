@@ -6,15 +6,14 @@
 import { Hono } from 'hono';
 import { bearerAuth, cors, logger } from 'honoMiddleware';
 import { MiddlewareConfig } from './utilities/middleware.ts';
-import { initializeMongoConnector } from './utilities/database.ts';
+import { initializeMongoConnector } from './database/database.ts';
 import { errors, info } from './utilities/constants.ts';
-
 import { rootController } from './controllers/root.ts';
 import { featuresController } from './controllers/features.ts';
 
 await initializeMongoConnector();
 
-const app = new Hono();
+export const app = new Hono();
 const mwConfig = MiddlewareConfig();
 
 // enable cors if requested
