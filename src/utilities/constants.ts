@@ -3,6 +3,7 @@
 export const info = {
     WHEREABOUTS_NAME: 'Whereabouts API',
     WHEREABOUTS_VERSION: '2.1.0',
+    WHEREABOUTS_CACHE_LIFETIME: 600,
 };
 
 export const errors = {
