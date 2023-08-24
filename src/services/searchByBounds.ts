@@ -14,7 +14,7 @@ export async function searchByBounds(bbox: number[], classFilter: string) {
         },
     }, {
         projection: {
-            _id: false
-        }
+            _id: false,
+        },
     }).limit(1000).toArray();
 }

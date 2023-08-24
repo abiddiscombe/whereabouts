@@ -19,7 +19,7 @@ export async function searchByRadius(
         },
     }, {
         projection: {
-            _id: false
-        }
+            _id: false,
+        },
     }).limit(1000).toArray();
 }

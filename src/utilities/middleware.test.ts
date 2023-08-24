@@ -1,6 +1,6 @@
 // middleware.test.ts
-import { assertEquals } from "assert";
-import { MiddlewareConfig } from "./middleware.ts";
+import { assertEquals } from 'assert';
+import { MiddlewareConfig } from './middleware.ts';
 
 Deno.test('that an empty middleware config is returned', () => {
     Deno.env.set('AUTH_TOKEN', '');
@@ -9,12 +9,12 @@ Deno.test('that an empty middleware config is returned', () => {
     assertEquals(result, {
         auth: {
             enabled: false,
-            token: ''
+            token: '',
         },
         cors: {
             enabled: false,
-            origin: ''
-        }
+            origin: '',
+        },
     });
 });
 
@@ -25,11 +25,11 @@ Deno.test('that a valid middleware is returned when environment vars are set', (
     assertEquals(result, {
         auth: {
             enabled: true,
-            token: 'testMiddlewareValueForAuth'
+            token: 'testMiddlewareValueForAuth',
         },
         cors: {
             enabled: true,
-            origin: 'testMiddlewareValueForCors'
-        }
+            origin: 'testMiddlewareValueForCors',
+        },
     });
 });

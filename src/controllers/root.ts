@@ -1,6 +1,6 @@
 // root.ts
 import { type Context, Hono } from 'hono';
-import { info, endpointDescs } from '../utilities/constants.ts';
+import { info } from '../utilities/constants.ts';
 import { getFeatureCount } from '../services/getFeatureCount.ts';
 
 export const rootController = new Hono();
@@ -19,7 +19,7 @@ rootController.get('/', async (c: Context) => {
             {
                 name: 'Feature Search',
                 href: '/features',
-                desc: endpointDescs.features,
+                desc: 'Returns GeoJSON features. Supports either bbox or radial search methods.',
             },
         ],
     });

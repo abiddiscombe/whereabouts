@@ -1,11 +1,11 @@
 // features.test.ts
-import { assertEquals } from "assert";
-import { info } from "../utilities/constants.ts";
+import { assertEquals } from 'assert';
+import { info } from '../utilities/constants.ts';
 import { app } from '../main.ts';
 
-function assertStandardResponseMetadata(resBody: { time: string, host: string}) {
-    assertEquals(typeof(resBody.time), 'number');
-    assertEquals(typeof(resBody.host), 'string');
+function assertStandardResponseMetadata(resBody: { time: string; host: string }) {
+    assertEquals(typeof (resBody.time), 'number');
+    assertEquals(typeof (resBody.host), 'string');
     assertEquals(resBody.host, `${info.WHEREABOUTS_NAME} > Feature Search`);
 }
 
@@ -176,7 +176,7 @@ Deno.test('the response with the radius search method - radius is valid', async 
 
     // check query
     assertEquals(resBody.query.radius.distance, 1000);
-    assertEquals(resBody.query.radius.center, [-0.126235,51.509991]);
+    assertEquals(resBody.query.radius.center, [-0.126235, 51.509991]);
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
@@ -191,7 +191,7 @@ Deno.test('the response with the radius search method - radius is valid and filt
 
     // check query
     assertEquals(resBody.query.radius.distance, 1000);
-    assertEquals(resBody.query.radius.center, [-0.126235,51.509991]);
+    assertEquals(resBody.query.radius.center, [-0.126235, 51.509991]);
     assertEquals(resBody.query.filter, 'populatedplace.city');
 
     // check FeatureCollection
@@ -207,7 +207,7 @@ Deno.test('the response with the radius search method - radius is valid and cust
 
     // check query
     assertEquals(resBody.query.radius.distance, 500);
-    assertEquals(resBody.query.radius.center, [-0.126235,51.509991]);
+    assertEquals(resBody.query.radius.center, [-0.126235, 51.509991]);
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
@@ -222,7 +222,7 @@ Deno.test('the response with the radius search method - radius is valid but ther
 
     // check query
     assertEquals(resBody.query.radius.distance, 1000);
-    assertEquals(resBody.query.radius.center, [0.921478,51.507460]);
+    assertEquals(resBody.query.radius.center, [0.921478, 51.507460]);
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
