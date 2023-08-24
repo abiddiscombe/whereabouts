@@ -8,7 +8,7 @@
   "tasks": {
     "dev": "deno run --allow-env --allow-read --allow-sys=osRelease --allow-net --watch src/main.ts",
     "test": "deno test --allow-env --allow-read --allow-sys=osRelease --allow-net --trace-ops",
-    "startProd": "deno run --allow-net --allow-env src/main.ts"
+    "startProd": "deno run --allow-all src/main.ts"
   },
   "imports": {
     "hono": "https://deno.land/x/hono@v3.4.2/mod.ts",
