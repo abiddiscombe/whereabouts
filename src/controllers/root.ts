@@ -19,7 +19,7 @@ rootController.get('/', async (c: Context) => {
             {
                 name: 'Class List',
                 href: '/classes',
-                desc: 'Returns a list of available classes by which searches can be filtered on',
+                desc: 'Returns a list of available classes on which searches can be filtered.',
             },
             {
                 name: 'Feature Search',

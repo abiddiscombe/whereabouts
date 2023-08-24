@@ -10,6 +10,9 @@ In this screenshot, the database was populated with Ordnance Survey's [Open Name
 ### `/`
 [ GET ] Lists metadata about the API and its endpoints.
 
+### `/classes`
+[ GET ] Returns a list of available classes on which searches can be filtered.
+
 ### `/features`
 [ GET ] Returns a GeoJSON FeatureCollection consisting of features matching one of the following search methods:
 
