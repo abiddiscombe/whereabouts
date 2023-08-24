@@ -58,7 +58,7 @@ featuresController.get('/', async (c: Context) => {
                     ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
                     matches: features.length,
-                    bbox: bbox,
+                    bbox: bboxFiltered,
                 },
                 type: 'FeatureCollection',
                 features: features,
