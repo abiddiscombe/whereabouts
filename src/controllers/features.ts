@@ -57,6 +57,7 @@ featuresController.get('/', async (c: Context) => {
                 query: {
                     ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
+                    matches: features.length,
                     bbox: bbox,
                 },
                 type: 'FeatureCollection',
@@ -107,6 +108,7 @@ featuresController.get('/', async (c: Context) => {
                 query: {
                     ..._featureLimitWarning(features.length),
                     ...(filter) ? { filter: filter } : {},
+                    matches: features.length,
                     radius: {
                         center: centerFiltered,
                         distance: distanceFiltered,
