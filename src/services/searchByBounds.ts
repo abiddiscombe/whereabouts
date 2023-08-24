@@ -1,6 +1,5 @@
-// services/searchByBounds
-
-import { mongoConnector } from '../utilities/database.ts';
+// searchByBounds.ts
+import { mongoConnector } from '../database/database.ts';
 
 export async function searchByBounds(bbox: number[], classFilter: string) {
     return await mongoConnector.find({
@@ -12,6 +11,10 @@ export async function searchByBounds(bbox: number[], classFilter: string) {
                     [bbox[2], bbox[3]],
                 ],
             },
+        },
+    }, {
+        projection: {
+            _id: false,
         },
     }).limit(1000).toArray();
 }

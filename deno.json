@@ -1,4 +1,4 @@
-{
+{ 
   "fmt": {
     "include": ["src/"],
     "singleQuote": true,
@@ -6,12 +6,15 @@
     "indentWidth": 4
   },
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease --watch src/main.ts",
-    "startProd": "deno run --allow-net --allow-read --allow-env --allow-sys=osRelease src/main.ts"
+    "dev": "deno run --allow-env --allow-read --allow-sys=osRelease --allow-net --watch src/main.ts",
+    "test": "deno test --allow-env --allow-read --allow-sys=osRelease --allow-net --trace-ops",
+    "startProd": "deno run --allow-net --allow-env src/main.ts"
   },
   "imports": {
-    "oak": "https://deno.land/x/oak/mod.ts",
+    "hono": "https://deno.land/x/hono@v3.4.2/mod.ts",
+    "honoMiddleware": "https://deno.land/x/hono@v3.4.2/middleware.ts",
     "mongodb": "npm:mongodb",
-    "@turf/turf": "npm:@turf/turf"
+    "@turf/turf": "npm:@turf/turf",
+    "assert": "https://deno.land/std@0.198.0/assert/mod.ts"
   }
 }

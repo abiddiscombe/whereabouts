@@ -1,27 +1,34 @@
-// src/controllers/root.ts
-
+// root.ts
+import { type Context, Hono } from 'hono';
+import { info } from '../utilities/constants.ts';
 import { getFeatureCount } from '../services/getFeatureCount.ts';
 
-// deno-lint-ignore no-explicit-any
-export async function root(ctx: any, next: any) {
+export const rootController = new Hono();
+
+rootController.get('/', async (c: Context) => {
     const totalFeatures = await _featureCount();
 
-    ctx.response.body = {
+    return c.json({
         time: Math.floor(Date.now() / 1000),
-        host: 'Whereabouts API',
+        host: info.WHEREABOUTS_NAME,
         info: {
-            version: '2.0.0',
+            version: info.WHEREABOUTS_VERSION,
             totalFeatures: totalFeatures,
         },
         links: [
+            {
+                name: 'Class List',
+                href: '/classes',
+                desc: 'Returns a list of available classes on which searches can be filtered.',
+            },
             {
                 name: 'Feature Search',
                 href: '/features',
                 desc: 'Returns GeoJSON features. Supports either bbox or radial search methods.',
             },
         ],
-    };
-}
+    });
+});
 
 async function _featureCount() {
     try {

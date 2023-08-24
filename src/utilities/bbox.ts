@@ -1,5 +1,4 @@
-// src/utilities/bbox.ts
-
+// bbox.ts
 import * as turf from '@turf/turf';
 
 export function bboxTooLarge(bbox: number[]) {

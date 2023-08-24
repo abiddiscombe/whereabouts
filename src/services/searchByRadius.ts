@@ -1,6 +1,5 @@
-// services/searchByRadius
-
-import { mongoConnector } from '../utilities/database.ts';
+// searchByRadius.ts
+import { mongoConnector } from '../database/database.ts';
 
 export async function searchByRadius(
     geom: number[],
@@ -17,6 +16,10 @@ export async function searchByRadius(
                 },
                 $maxDistance: distance,
             },
+        },
+    }, {
+        projection: {
+            _id: false,
         },
     }).limit(1000).toArray();
 }
