@@ -17,6 +17,11 @@ rootController.get('/', async (c: Context) => {
         },
         links: [
             {
+                name: 'Class List',
+                href: '/classes',
+                desc: 'Returns a list of available classes by which searches can be filtered on',
+            },
+            {
                 name: 'Feature Search',
                 href: '/features',
                 desc: 'Returns GeoJSON features. Supports either bbox or radial search methods.',

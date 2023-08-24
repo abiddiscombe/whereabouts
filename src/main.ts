@@ -9,6 +9,7 @@ import { MiddlewareConfig } from './utilities/middleware.ts';
 import { initializeMongoConnector } from './database/database.ts';
 import { errors, info } from './utilities/constants.ts';
 import { rootController } from './controllers/root.ts';
+import { classesController } from './controllers/classes.ts';
 import { featuresController } from './controllers/features.ts';
 
 await initializeMongoConnector();
@@ -38,6 +39,7 @@ if (mwConfig.auth.token) {
 
 app.use('*', logger());
 app.route('/', rootController);
+app.route('/classes', classesController);
 app.route('/features', featuresController);
 
 app.notFound((c) => {

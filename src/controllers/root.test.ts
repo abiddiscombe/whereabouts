@@ -17,7 +17,7 @@ Deno.test('that the default response is constructed correctly', async () => {
     assertEquals(resBody.info.version, info.WHEREABOUTS_VERSION);
 
     // body > links
-    assertEquals(resBody.links.length, 1);
+    assertEquals(resBody.links.length, 2);
     resBody.links.forEach((link: { name: string; href: string; desc: string }) => {
         assertEquals(typeof (link.name), 'string');
         assertEquals(typeof (link.href), 'string');

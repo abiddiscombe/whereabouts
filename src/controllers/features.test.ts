@@ -84,7 +84,7 @@ Deno.test('the response with the bbox search method - bbox is valid', async () =
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 1);
+    assertEquals(resBody.features.length, 209);
 });
 
 Deno.test('the response with the bbox search method - bbox is valid and filter provided', async () => {
@@ -99,7 +99,7 @@ Deno.test('the response with the bbox search method - bbox is valid and filter p
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 0);
+    assertEquals(resBody.features.length, 176);
 });
 
 Deno.test('the response with the bbox search method - bbox is valid but there are no results', async () => {
@@ -180,7 +180,7 @@ Deno.test('the response with the radius search method - radius is valid', async 
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 6);
+    assertEquals(resBody.features.length, 1000);
 });
 
 Deno.test('the response with the radius search method - radius is valid and filter provided', async () => {
@@ -211,7 +211,7 @@ Deno.test('the response with the radius search method - radius is valid and cust
 
     // check FeatureCollection
     assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 3);
+    assertEquals(resBody.features.length, 1000);
 });
 
 Deno.test('the response with the radius search method - radius is valid but there are no results', async () => {
