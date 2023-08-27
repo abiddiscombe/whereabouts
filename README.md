@@ -3,7 +3,7 @@ A GeoJSON Point Feature API, searchable via `radial` or `bbox` queries with addi
 
 ![Screenshot of a Whereabouts API response](media/banner.png)
 
-In this screenshot, the database was populated with Ordnance Survey's [Open Names](https://osdatahub.os.uk/docs/names/overview) POI dataset consisting of around 3 million features. The Whereabouts API, using MongoDB's geospatial capabilities, can query this data and return a result of up-to 1,000 features in less than a second. You can try it for yourself using the demo linked to this project.
+In this screenshot, the database was populated with Ordnance Survey's [Open Names](https://osdatahub.os.uk/docs/names/overview) POI dataset consisting of around 3 million features. The Whereabouts API, using MongoDB's geospatial capabilities, can query this data and return a result of up-to 1,000 features in less than a second.
 
 ## API Endpoints
 
@@ -14,7 +14,7 @@ In this screenshot, the database was populated with Ordnance Survey's [Open Name
 [ GET ] Returns a list of available classes on which searches can be filtered.
 
 ### `/features`
-[ GET ] Returns a GeoJSON FeatureCollection consisting of features matching one of the following search methods:
+[ GET ] Returns a GeoJSON FeatureCollection matching one of the following search methods:
 
 - **Radius** - `?radius=lng,lat,distance`  
 *Specifying a distance (in meters) is optional, the value must be an integer between 1 and 1000. The default distance value is 1000.*
@@ -30,9 +30,15 @@ Metadata on the type of query used to return a set of features is provided in th
 Each GeoJSON point feature is stored as a unique document in MongoDB; documents are stored in a collection named `features`. The properties of the feature much contain the following attribution, but additional key-value pairs can also be added and these will appear in the search results.
 - `fid` -  A Feature ID that is unique to a feature and thus can be used to identify it. MongoDB's default `_id` value is not revealed via the API.
 - `name` - A name for each feature which can be set to any string. Duplicate names are valid.
-- `class` - A classification value which can be used to filter queries further. A class must be a string with no spaces or special characters.
+- `class` - A classification string which can be used to filter a response. No special characters permitted.
 
-Geospatial capabilities are provided by setting MongoDB's `2Dsphere` index on the `geometry.coordinates` field. The server facilitates request validation and error handling prior to queries reaching the database.
+
+
+### Index Configuration
+- `2Dsphere` index on `geometry.coordinates`\
+Required to provide geospatial capabilities.
+- `regular` index on `properties.class`\
+Required for efficient use of the `distinct` operation. **Not configuring this index will result in very high [RPUs](https://www.mongodb.com/pricing) per request when using MongoDB Atlas**.
 
 ## Deployment Instructions
 The server image is [published to Docker Hub](https://hub.docker.com/r/abiddiscombe/whereabouts) as `abiddiscombe/whereabouts`. The image accepts the following environment variables:
