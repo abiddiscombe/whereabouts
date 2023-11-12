@@ -2,19 +2,19 @@
   "fmt": {
     "include": ["src/"],
     "singleQuote": true,
-    "lineWidth": 120,
-    "indentWidth": 4
+    "lineWidth": 110
   },
   "tasks": {
     "dev": "deno run --allow-env --allow-read --allow-sys=osRelease --allow-net --watch src/main.ts",
     "test": "deno test --allow-env --allow-read --allow-sys=osRelease --allow-net --trace-ops",
-    "startProd": "deno run --allow-all src/main.ts"
+    "docker-init": "deno run --allow-all src/main.ts"
   },
   "imports": {
-    "hono": "https://deno.land/x/hono@v3.4.2/mod.ts",
-    "honoMiddleware": "https://deno.land/x/hono@v3.4.2/middleware.ts",
     "mongodb": "npm:mongodb",
     "@turf/turf": "npm:@turf/turf",
-    "assert": "https://deno.land/std@0.198.0/assert/mod.ts"
+    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
+    "hono": "https://deno.land/x/hono@v3.9.2/mod.ts",
+    "assert": "https://deno.land/std@0.198.0/assert/mod.ts",
+    "honoMiddleware": "https://deno.land/x/hono@v3.9.2/middleware.ts",
   }
 }

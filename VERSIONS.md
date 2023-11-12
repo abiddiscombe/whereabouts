@@ -1,5 +1,18 @@
 # VERSIONS.md
 
+## Version 3.0.0 (November 2023)
+Due to the nature of this release, the commits listed are not true Git history.
+- [X] #FEAT!: Full-text search via `?name=x`.
+- [X] #FEAT!: New `/metadata` endpoint.
+- [X] #FEAT!: GeoJSON result offset handling via `?offset=1000` etc.
+- [X] #FEAT!: Increase maximum radius search distance to 2000 meters.
+- [X] #FEAT!: Increase maximum bounds search distance to 2 km<sup>2</sup>.
+- [X] #CHORE: Bump dependencies.
+- [X] #TEST: Partial update to endpoint test suite (WIP).
+- [X] #REFACTOR!: Migrate to `messages.ts` text store.
+- [X] #REFACTOR!: Global code refactor and improvements to error handling.
+- [X] #REFACTOR!: Improved user input validation handling via the Zod library.
+
 ## Version 2.1.0 (August 2023)
 - [X] #FIX HTTP status code mismatches for `/features` validation errors.
 - [X] #FIX Prevent a feature's MongoDB `_id` from leaking into JSON response.

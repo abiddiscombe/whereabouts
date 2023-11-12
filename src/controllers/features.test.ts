@@ -1,230 +1,243 @@
-// features.test.ts
-import { assertEquals } from 'assert';
-import { info } from '../utilities/constants.ts';
 import { app } from '../main.ts';
+import { assertEquals } from 'assert';
+import { messages } from '../utilities/messages.ts';
 
-function assertStandardResponseMetadata(resBody: { time: string; host: string }) {
-    assertEquals(typeof (resBody.time), 'number');
-    assertEquals(typeof (resBody.host), 'string');
-    assertEquals(resBody.host, `${info.WHEREABOUTS_NAME} > Feature Search`);
+function assertStandardResponseMetadata(resBody: { host: string; endpoint: string }) {
+  assertEquals(typeof (resBody.host), 'string');
+  assertEquals(resBody.host, `${messages.info.name} (v${messages.info.version})`);
+  assertEquals(typeof (resBody.endpoint), 'string');
+  assertEquals(resBody.endpoint, '/features');
+}
+
+function assertCorrectErrorMessage(errorId: string, resStatus: number, resBody: { error: string }) {
+  assertEquals(resStatus, messages.errors[errorId].status);
+  assertEquals(resBody.error, messages.errors[errorId].summary);
 }
 
 // invalid search method
 
-Deno.test('the response without a search method provided', async () => {
-    const res = await app.request('/features');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Please provide one method (bbox or radius) to search by.');
+Deno.test('NO SEACH METHOD', async () => {
+  const res = await app.request('/features');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Gen-NoSearchParameter', res.status, resBody);
 });
 
-Deno.test('the response with both search methods provided', async () => {
-    const res = await app.request('/features?bbox=0,1,2,3&radius=0,1');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Please provide either a bbox or radius search query.');
+Deno.test('MULTIPLE SEARCH METHODS - NAME AND RADIUS', async () => {
+  const res = await app.request('/features?name=x&radius=y');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Gen-MultipleSearchParameters', res.status, resBody);
 });
 
-// bbox search method
-
-Deno.test('the response with the bbox search method - bbox length too small', async () => {
-    const res = await app.request('/features?bbox=0,1,2');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Bounding Box (bbox) invalid.');
+Deno.test('MULTIPLE SEARCH METHODS - RADIUS AND BOUNDS', async () => {
+  const res = await app.request('/features?radius=x&bounds=y');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Gen-MultipleSearchParameters', res.status, resBody);
 });
 
-Deno.test('the response with the bbox search method - bbox length too large', async () => {
-    const res = await app.request('/features?bbox=0,1,2,3,4');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Bounding Box (bbox) invalid.');
+Deno.test('MULTIPLE SEARCH METHODS - BOUNDS AND NAME', async () => {
+  const res = await app.request('/features?bounds=x&name=y');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Gen-MultipleSearchParameters', res.status, resBody);
 });
 
-Deno.test('the response with the bbox search method - bbox contains letters', async () => {
-    const res = await app.request('/features?bbox=0,1,a,3');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
+// name search method
 
-    // check error message
-    assertEquals(resBody.error, 'Bounding Box (bbox) invalid.');
+Deno.test('NAME SEARCH', async () => {
+  const res = await app.request('/features?name=Waterloo');
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
+
+  // check query
+  assertEquals(resBody.metadata.queryParams.name, 'Waterloo');
+
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 435);
 });
 
-Deno.test('the response with the bbox search method - bbox is too large', async () => {
-    const res = await app.request('/features?bbox=-3.197021,53.173119,-2.559814,53.546836');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
+Deno.test('NAME SEARCH WITH CLASS FILTER', async () => {
+  const res = await app.request('/features?name=Waterloo&class=transportnetwork.railwaystation');
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
 
-    // check error message
-    assertEquals(resBody.error, 'Bounding Box too large. Maximum size is 1 km2');
+  // check query
+  assertEquals(resBody.metadata.queryParams.name, 'Waterloo');
+  assertEquals(resBody.metadata.queryParams.filter.class, 'transportnetwork.railwaystation');
+
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 3);
 });
 
-Deno.test('the response with the bbox search method - bbox is valid', async () => {
-    const res = await app.request('/features?bbox=-0.126235,51.509991,-0.119927,51.512936');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
-
-    // check query
-    assertEquals(resBody.query.bbox, '-0.126235,51.509991,-0.119927,51.512936');
-
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 209);
+Deno.test('NAME SEARCH WITH OFFSET', async () => {
+  const res = await app.request('/features?name=Waterloo&offset=1000');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertEquals(resBody.info, 'The provided \'offset\' filter has no effect on a textual query.');
 });
 
-Deno.test('the response with the bbox search method - bbox is valid and filter provided', async () => {
-    const res = await app.request('/features?bbox=-0.126235,51.509991,-0.119927,51.512936&filter=other.postcode');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
+// bounds search method
 
-    // check query
-    assertEquals(resBody.query.bbox, '-0.126235,51.509991,-0.119927,51.512936');
-    assertEquals(resBody.query.filter, 'other.postcode');
-
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 176);
+Deno.test('BOUNDS SEARCH - INPUT TOO SMALL', async () => {
+  const res = await app.request('/features?bounds=0,1,2');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Bounds-WrongFormat', res.status, resBody);
 });
 
-Deno.test('the response with the bbox search method - bbox is valid but there are no results', async () => {
-    const res = await app.request('/features?bbox=0.921478,51.507460,0.926285,51.511307');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
+Deno.test('BOUNDS SEARCH - INPUT TOO LONG', async () => {
+  const res = await app.request('/features?bounds=0,1,2,3,4');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Bounds-WrongFormat', res.status, resBody);
+});
 
-    // check query
-    assertEquals(resBody.query.bbox, '0.921478,51.507460,0.926285,51.511307');
+Deno.test('BOUNDS SEARCH - INPUT CONTAIN LETTERS', async () => {
+  const res = await app.request('/features?bounds=0,1,a,3');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Bounds-WrongFormat', res.status, resBody);
+});
 
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 0);
+Deno.test('BOUNDS SEARCH - INPUT AREA TOO LARGE', async () => {
+  const res = await app.request('/features?bounds=-0.148916,51.487797,-0.078964,51.534324');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Bounds-TooLarge', res.status, resBody);
+});
+
+Deno.test('BOUNDS SEARCH - VALID', async () => {
+  const res = await app.request('/features?bounds=-0.126235,51.509991,-0.119927,51.512936');
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
+
+  // check query
+  assertEquals(resBody.metadata.queryParams.bounds, [-0.126235, 51.509991, -0.119927, 51.512936]);
+
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 210);
+});
+
+Deno.test('BOUNDS SEARCH - VALID AND WITH FILTER', async () => {
+  const res = await app.request(
+    '/features?bounds=-0.126235,51.509991,-0.119927,51.512936&class=transportnetwork.namedroad',
+  );
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
+
+  // check query
+  assertEquals(resBody.metadata.queryParams.bounds, [-0.126235, 51.509991, -0.119927, 51.512936]);
+  assertEquals(resBody.metadata.queryParams.filter.class, 'transportnetwork.namedroad');
+
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 31);
+});
+
+Deno.test('BOUNDS SEARCH - VALID BUT NO RESULTS', async () => {
+  const res = await app.request('/features?bounds=0.921478,51.507460,0.926285,51.511307');
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
+
+  // check query
+  assertEquals(resBody.metadata.queryParams.bounds, [0.921478, 51.507460, 0.926285, 51.511307]);
+
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 0);
 });
 
 // radius search method
 
-Deno.test('the response with the radius search method - radius length too small', async () => {
-    const res = await app.request('/features?radius=0');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Radius parameter is invalid.');
+Deno.test('RADIUS SEARCH - INPUT TOO SMALL', async () => {
+  const res = await app.request('/features?radius=0');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Radius-WrongFormat', res.status, resBody);
 });
 
-Deno.test('the response with the radius search method - radius length too large', async () => {
-    const res = await app.request('/features?radius=0,1,2,3');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Radius parameter is invalid.');
+Deno.test('RADIUS SEARCH - INPUT TOO LONG', async () => {
+  const res = await app.request('/features?radius=0,1,2,3');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Radius-WrongFormat', res.status, resBody);
 });
 
-Deno.test('the response with the radius search method - radius contains letters', async () => {
-    const res = await app.request('/features?radius=0,a,2');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Radius parameter is invalid.');
+Deno.test('RADIUS SEARCH - INPUT CONTAINS LETTERS', async () => {
+  const res = await app.request('/features?radius=0,a,2');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Radius-WrongFormat', res.status, resBody);
 });
 
-Deno.test('the response with the radius search method - optional distance is too large', async () => {
-    const res = await app.request('/features?radius=-3.197021,53.173119,1001');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Distance outside of acceptable range (1 to 1000 meters).');
+Deno.test('RADIUS SEARCH - DISTANCE TOO SMALL', async () => {
+  const res = await app.request('/features?radius=-3.197021,53.173119,0.2');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Radius-SearchDistance', res.status, resBody);
 });
 
-Deno.test('the response with the radius search method - optional distance is too small', async () => {
-    const res = await app.request('/features?radius=-3.197021,53.173119,0.2');
-    const resBody = await res.json();
-    assertEquals(res.status, 406);
-    assertStandardResponseMetadata(resBody);
-
-    // check error message
-    assertEquals(resBody.error, 'Distance outside of acceptable range (1 to 1000 meters).');
+Deno.test('RADIUS SEARCH - DISTANCE TOO LARGE', async () => {
+  const res = await app.request('/features?radius=-3.197021,53.173119,2001');
+  const resBody = await res.json();
+  assertStandardResponseMetadata(resBody);
+  assertCorrectErrorMessage('Validation-Radius-SearchDistance', res.status, resBody);
 });
 
-Deno.test('the response with the radius search method - radius is valid', async () => {
-    const res = await app.request('/features?radius=-0.126235,51.509991');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
+Deno.test('RADIUS SEARCH - VALID', async () => {
+  const res = await app.request('/features?radius=-0.126235,51.509991,2000');
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
 
-    // check query
-    assertEquals(resBody.query.radius.distance, 1000);
-    assertEquals(resBody.query.radius.center, [-0.126235, 51.509991]);
+  // check query
+  assertEquals(resBody.metadata.queryParams.radius.distance, 2000);
+  assertEquals(resBody.metadata.queryParams.radius.center, [-0.126235, 51.509991]);
 
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 1000);
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 1000);
 });
 
-Deno.test('the response with the radius search method - radius is valid and filter provided', async () => {
-    const res = await app.request('/features?radius=-0.126235,51.509991&filter=populatedplace.city');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
+Deno.test('RADIUS SEARCH - VALID AND WITH CLASS FILTER', async () => {
+  const res = await app.request(
+    '/features?radius=-0.126235,51.509991,1000&class=populatedplace.city',
+  );
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
 
-    // check query
-    assertEquals(resBody.query.radius.distance, 1000);
-    assertEquals(resBody.query.radius.center, [-0.126235, 51.509991]);
-    assertEquals(resBody.query.filter, 'populatedplace.city');
+  // check query
+  assertEquals(resBody.metadata.queryParams.radius.distance, 1000);
+  assertEquals(resBody.metadata.queryParams.radius.center, [-0.126235, 51.509991]);
+  assertEquals(resBody.metadata.queryParams.filter.class, 'populatedplace.city');
 
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 1);
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 1);
 });
 
-Deno.test('the response with the radius search method - radius is valid and custom distance supplied', async () => {
-    const res = await app.request('/features?radius=-0.126235,51.509991,500');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
+Deno.test('RADIUS SEARCH - VALID BUT NO RESULTS', async () => {
+  const res = await app.request('/features?radius=0.921478,51.507460,1000');
+  const resBody = await res.json();
+  assertEquals(res.status, 200);
+  assertStandardResponseMetadata(resBody);
 
-    // check query
-    assertEquals(resBody.query.radius.distance, 500);
-    assertEquals(resBody.query.radius.center, [-0.126235, 51.509991]);
+  // check query
+  assertEquals(resBody.metadata.queryParams.radius.distance, 1000);
+  assertEquals(resBody.metadata.queryParams.radius.center, [0.921478, 51.507460]);
 
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 1000);
-});
-
-Deno.test('the response with the radius search method - radius is valid but there are no results', async () => {
-    const res = await app.request('/features?radius=0.921478,51.507460');
-    const resBody = await res.json();
-    assertEquals(res.status, 200);
-    assertStandardResponseMetadata(resBody);
-
-    // check query
-    assertEquals(resBody.query.radius.distance, 1000);
-    assertEquals(resBody.query.radius.center, [0.921478, 51.507460]);
-
-    // check FeatureCollection
-    assertEquals(resBody.type, 'FeatureCollection');
-    assertEquals(resBody.features.length, 0);
+  // check FeatureCollection
+  assertEquals(resBody.type, 'FeatureCollection');
+  assertEquals(resBody.features.length, 0);
 });

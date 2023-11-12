@@ -11,4 +11,4 @@ RUN mkdir ./src
 COPY . .
 RUN deno cache src/main.ts
 
-CMD ["task", "startProd"]
+CMD ["task", "docker-init"]
