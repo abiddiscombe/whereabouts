@@ -1,55 +1,35 @@
-// src/main.ts
-
 // whereabouts (GNU GPL 3.0)
 // https://github.com/abiddiscombe/whereabouts
 
 import { Hono } from 'hono';
-import { bearerAuth, cors, logger } from 'honoMiddleware';
-import { MiddlewareConfig } from './utilities/middleware.ts';
+import { cors, logger } from 'honoMiddleware';
+import { readCorsDomain } from './utilities/readCorsDomain.ts';
 import { initializeMongoConnector } from './database/database.ts';
-import { errors, info } from './utilities/constants.ts';
+import { messages } from './utilities/messages.ts';
+import { notFound } from './utilities/notFound.ts';
 import { rootController } from './controllers/root.ts';
 import { classesController } from './controllers/classes.ts';
 import { featuresController } from './controllers/features.ts';
+import { metadataController } from './controllers/metadata.ts';
 
 await initializeMongoConnector();
 
 export const app = new Hono();
-const mwConfig = MiddlewareConfig();
 
-// enable cors if requested
-if (mwConfig.cors.enabled) {
-    app.use(
-        '*',
-        cors({
-            origin: mwConfig.cors.origin,
-        }),
-    );
-}
-
-// enable auth if requested
-if (mwConfig.auth.token) {
-    app.use(
-        '*',
-        bearerAuth({
-            token: mwConfig.auth.token,
-        }),
-    );
-}
+app.use(
+  '*',
+  cors({
+    origin: readCorsDomain(),
+  }),
+);
 
 app.use('*', logger());
 app.route('/', rootController);
 app.route('/classes', classesController);
 app.route('/features', featuresController);
+app.route('/metadata', metadataController);
 
-app.notFound((c) => {
-    return c.json({
-        error: {
-            code: 404,
-            desc: errors.HTTP_404,
-        },
-    }, 404);
-});
+app.notFound(notFound);
 
-console.info(`${info.WHEREABOUTS_NAME} (${info.WHEREABOUTS_VERSION}) Server Started`);
+console.info(`${messages.info.name} (v${messages.info.version}) - Started.`);
 Deno.serve({ port: 8080 }, app.fetch);
