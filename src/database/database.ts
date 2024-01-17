@@ -9,9 +9,9 @@ export async function initializeMongoConnector() {
   const mongoDatabaseName = Deno.env.get('MONGO_DATABASE') || '';
 
   if (!mongoConnString) {
-    throw new Error('Environment Variable \'MONGO_URL\' is missing.');
+    throw new Error("Environment Variable 'MONGO_URL' is missing.");
   } else if (!mongoDatabaseName) {
-    throw new Error('Environment Variable \'MONGO_DATABASE\' is missing.');
+    throw new Error("Environment Variable 'MONGO_DATABASE' is missing.");
   }
 
   try {

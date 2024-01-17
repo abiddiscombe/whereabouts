@@ -79,7 +79,7 @@ Deno.test('NAME SEARCH WITH OFFSET', async () => {
   const res = await app.request('/features?name=Waterloo&offset=1000');
   const resBody = await res.json();
   assertStandardResponseMetadata(resBody);
-  assertEquals(resBody.info, 'The provided \'offset\' filter has no effect on a textual query.');
+  assertEquals(resBody.info, "The provided 'offset' filter has no effect on a textual query.");
 });
 
 // bounds search method

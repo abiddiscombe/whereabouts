@@ -8,6 +8,7 @@ A GeoJSON Point Feature API, searchable via feature name, radius, or bounding bo
 > Response of a geospatial radius query using Ordnance Survey's [Open Names](https://osdatahub.os.uk/docs/names/overview) dataset.
 
 ## API Service Endpoints
+*API responses are not pretty-printed by default. To format JSON responses from any endpoint, add the `?pretty` query parameter to your request.*
 
 ### `/`
 **Service Root** \
