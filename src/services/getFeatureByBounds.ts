@@ -5,6 +5,10 @@ export async function getFeatureByBounds(
   classFilter: string,
   offset: number,
 ) {
+  if (!mongoConnector.features) {
+    throw new Error('Failed to connect to MongoDB');
+  }
+
   try {
     const querySpec = {
       'geometry.coordinates': {
@@ -21,7 +25,7 @@ export async function getFeatureByBounds(
     };
     return {
       success: true,
-      features: await mongoConnector.find(querySpec, {
+      features: await mongoConnector.features.find(querySpec, {
         projection: {
           _id: false,
         },

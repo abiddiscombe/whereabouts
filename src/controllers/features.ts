@@ -43,7 +43,7 @@ featuresController.get('/', async (c: Context) => {
           }),
           type: 'FeatureCollection',
           ...(parsedOffsetFilter !== 0) && {
-            info: 'The provided \'offset\' filter has no effect on a textual query.',
+            info: "The provided 'offset' filter has no effect on a textual query.",
           },
           ...(dbResponse.features.length > 600) && {
             warn: 'A large number of results have been returned. Please refine your search.',

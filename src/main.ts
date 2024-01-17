@@ -2,7 +2,7 @@
 // https://github.com/abiddiscombe/whereabouts
 
 import { Hono } from 'hono';
-import { cors, logger } from 'honoMiddleware';
+import { cors, logger, prettyJSON } from 'honoMiddleware';
 import { readCorsDomain } from './utilities/readCorsDomain.ts';
 import { initializeMongoConnector } from './database/database.ts';
 import { messages } from './utilities/messages.ts';
@@ -16,14 +16,19 @@ await initializeMongoConnector();
 
 export const app = new Hono();
 
-app.use(
-  '*',
-  cors({
+const middlewareConfig = {
+  cors: {
     origin: readCorsDomain(),
-  }),
-);
+  },
+  prettyJSON: {
+    space: 4,
+  },
+};
 
 app.use('*', logger());
+app.use('*', cors(middlewareConfig.cors));
+app.use('*', prettyJSON(middlewareConfig.prettyJSON));
+
 app.route('/', rootController);
 app.route('/classes', classesController);
 app.route('/features', featuresController);

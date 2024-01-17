@@ -20,7 +20,7 @@ interface messagesType {
 export const messages: messagesType = {
   info: {
     name: 'Whereabouts API Service',
-    version: '3.0.0',
+    version: '3.1.0',
   },
 
   endpoints: {
@@ -53,15 +53,15 @@ export const messages: messagesType = {
     },
     'InternalServiceError-Name': {
       status: 500,
-      summary: 'Internal Server Error. Something went wrong handling the \'name\' request.',
+      summary: "Internal Server Error. Something went wrong handling the 'name' request.",
     },
     'InternalServiceError-Bounds': {
       status: 500,
-      summary: 'Internal Server Error. Something went wrong handling the \'bounds\' request.',
+      summary: "Internal Server Error. Something went wrong handling the 'bounds' request.",
     },
     'InternalServiceError-Radius': {
       status: 500,
-      summary: 'Internal Server Error. Something went wrong handling the \'radius\' request.',
+      summary: "Internal Server Error. Something went wrong handling the 'radius' request.",
     },
     'InternalServiceError-ClassList': {
       status: 500,
@@ -69,55 +69,55 @@ export const messages: messagesType = {
     },
     'Validation-Gen-NoSearchParameter': {
       status: 400,
-      summary: 'Please define a search method (\'name\', \'bounds\', or \'radius\') via query parameter.',
+      summary: "Please define a search method ('name', 'bounds', or 'radius') via query parameter.",
     },
     'Validation-Gen-MultipleSearchParameters': {
       status: 400,
-      summary: 'Only a single search method (\'name\', \'bounds\', or \'radius\') is permitted per query.',
+      summary: "Only a single search method ('name', 'bounds', or 'radius') is permitted per query.",
     },
     'Validation-Name-WrongFormat': {
       status: 400,
-      summary: 'The format of \'name\' is incorrect.',
+      summary: "The format of 'name' is incorrect.",
     },
     'Validation-Name-IncorrectLengthShort': {
       status: 406,
-      summary: 'The length of parameter \'name\' is too short.',
+      summary: "The length of parameter 'name' is too short.",
     },
     'Validation-Name-IncorrectLengthLong': {
       status: 406,
-      summary: 'The length of parameter \'name\' is too long.',
+      summary: "The length of parameter 'name' is too long.",
     },
     'Validation-Bounds-WrongFormat': {
       status: 400,
-      summary: 'The format of \'bounds\' is incorrect.',
+      summary: "The format of 'bounds' is incorrect.",
     },
     'Validation-Bounds-TooLarge': {
       status: 406,
-      summary: 'The area of parameter \'bounds\' is too large. Please specify an area less than 2 km2.',
+      summary: "The area of parameter 'bounds' is too large. Please specify an area less than 2 km2.",
     },
     'Validation-Radius-WrongFormat': {
       status: 400,
-      summary: 'The format of \'radius\' is incorrect.',
+      summary: "The format of 'radius' is incorrect.",
     },
     'Validation-Radius-SearchDistance': {
       status: 406,
-      summary: 'The search distance for \'radius\' must be greater than 1 and less than 2000 meters.',
+      summary: "The search distance for 'radius' must be greater than 1 and less than 2000 meters.",
     },
     'Validation-ClassFilter-WrongFormat': {
       status: 400,
-      summary: 'The format of \'class\' is incorrect.',
+      summary: "The format of 'class' is incorrect.",
     },
     'Validation-ClassFilter-InvalidClass': {
       status: 406,
-      summary: 'The \'class\' string provided does not match any classes in the database.',
+      summary: "The 'class' string provided does not match any classes in the database.",
     },
     'Validation-OffsetFilter-WrongFormat': {
       status: 400,
-      summary: 'The format of \'offset\' is incorrect. Please supply an integer that is a multiple of 1000.',
+      summary: "The format of 'offset' is incorrect. Please supply an integer that is a multiple of 1000.",
     },
     'Validation-OffsetFilter-NotMultiple1000': {
       status: 406,
-      summary: 'The integer provided in \'offset\' is not a multiple of 1000.',
+      summary: "The integer provided in 'offset' is not a multiple of 1000.",
     },
   },
 };

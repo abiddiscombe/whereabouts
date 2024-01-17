@@ -15,5 +15,5 @@ Deno.test('that the default response is constructed correctly', async () => {
 
   // body > metadata
   assertEquals(resBody.metadata.service.version, messages.info.version);
-  assertEquals(typeof(resBody.metadata.dataset.totalFeatures), 'number');
+  assertEquals(typeof (resBody.metadata.dataset.totalFeatures), 'number');
 });

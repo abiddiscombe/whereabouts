@@ -1,7 +1,12 @@
 import Fuse from 'npm:fuse.js';
+import { Document, WithId } from 'mongodb';
 import { mongoConnector } from '../database/database.ts';
 
 export async function getFeatureByName(name: string, classFilter: string) {
+  if (!mongoConnector.features) {
+    throw new Error('Failed to connect to MongoDB');
+  }
+
   try {
     const querySpec = {
       '$text': {
@@ -12,7 +17,7 @@ export async function getFeatureByName(name: string, classFilter: string) {
       },
     };
 
-    const featuresRaw = await mongoConnector.find(querySpec, {
+    const featuresRaw = await mongoConnector.features.find(querySpec, {
       projection: {
         _id: false,
       },
@@ -33,7 +38,7 @@ export async function getFeatureByName(name: string, classFilter: string) {
   }
 }
 
-function _filterByFuse(features: [], target: string) {
+function _filterByFuse(features: WithId<Document>[], target: string) {
   const fuseAgent = new Fuse(features, {
     threshold: 0.4,
     keys: ['properties.name'],

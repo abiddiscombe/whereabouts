@@ -1,5 +1,9 @@
 # VERSIONS.md
 
+## Version 3.1.0 (January 2024)
+- feat: Add PrettyJSON Hono middleware integration / fmt run
+- feat: Add support for extended dataset metadata via MongoDB collection
+
 ## Version 3.0.0 (November 2023)
 Due to the nature of this release, the commits listed are not true Git history.
 - [X] #FEAT!: Full-text search via `?name=x`.
