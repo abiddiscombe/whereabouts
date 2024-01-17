@@ -46,6 +46,8 @@ Accepts a partial or full feature name to search by. User input must be between 
 **Service Metadata** \
 [ GET ] Returns metadata about the Whereabouts API service and the source dataset.
 
+The `totalClasses` and `totalFeatures` fields are calculated from the source dataset. The `name`, `license`, `version`, and `documentation` fields are each optional and can be included by passing a single document (with matching key-value pairs) into a `metdata` collection within the MongoDB database.
+
 
 ## Deployment Guide
 The Whereabouts API Server is designed to operate as a Bring-Your-Own-Dataset utility. Providing a dataset consists of point GeoJSON features stored in MongoDB in accordance with the specification below, the server should be able to parse it.
@@ -58,7 +60,7 @@ The following environment variables are required:
 A valid MongoDB connection string. It should look like: `mongodb+srv://uname:pword@example.com`.
 
 - `MONGO_DATABASE` \
-The name of the database to connect to. The database's primary collection must be named `features`.
+The name of the database to connect to. The database collections must be named `features` and `metadata`.
 
 - `CORS_ORIGIN` \
 A valid fully-qualified domain name. Supply a wildcard (`*`) to enable CORS for all origins. Not supplying a value will disable CORS headers.
@@ -74,6 +76,9 @@ MongoDB index fields are required to handle geospatial and full-text search quer
 - `properties.name` - `text`
 - `properties.class` - `regular`
 - `geometry.coordinates` - `2Dsphere`
+
+
+The MongoDB database can also optionally contain a collection named `metadata`. This collection can store a single document containing key-value pairs matching those described in the `/metdata` endpoint instructions.
 
 ## Development Notes
 
