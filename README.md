@@ -1,7 +1,8 @@
 # Whereabouts API
 A GeoJSON Point Feature API, searchable via feature name, radius, or bounding box queries with additional class-based feature filtering supported. Whereabouts is built with [Deno](https://deno.com/runtime), the [Hono](https://honojs.dev) web framework, and [MongoDB](https://www.mongodb.com).
+
 > **Service Demo** \
-> You can try-out Whereabouts using the demo at [ab-demo-whereabouts-server.nicebay-8db3cc3c.uksouth.azurecontainerapps.io](https://ab-demo-whereabouts-server.nicebay-8db3cc3c.uksouth.azurecontainerapps.io). The demo app is spun-up on demand and thus subject to (~5 sec) cold starts.
+> You can access a demo of the Whereabouts API at https://ab-whereabouts-demo.onrender.com - this instance is spun-up on demand and subject to a cold start of up to 60 seconds.
 
 ![Screenshot of a Whereabouts API response](media/banner.png)
 
